@@ -142,6 +142,8 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLogin
         });
 
         googleButtonRef.current.innerHTML = '';
+        const containerWidth = googleButtonRef.current.parentElement?.clientWidth || 350;
+        const buttonWidth = Math.max(200, Math.min(400, Math.floor(containerWidth)));
         window.google.accounts.id.renderButton(googleButtonRef.current, {
           theme: 'outline',
           size: 'large',
@@ -149,7 +151,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLogin
           shape: 'rectangular',
           text: view === 'register' ? 'signup_with' : 'signin_with',
           logo_alignment: 'left',
-          width: 350,
+          width: buttonWidth,
         });
         setGoogleLoaded(true);
       } catch (err) {
@@ -176,6 +178,15 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLogin
       isMounted = false;
     };
   }, [isOpen, view]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [isOpen, onClose]);
 
   const handleGoogleSuccess = async (response: any) => {
     if (!response?.credential) return;
@@ -383,17 +394,21 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLogin
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/45 backdrop-blur-xs animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-950/45 backdrop-blur-xs animate-in fade-in duration-200"
       onClick={onClose}
     >
-      <div className="w-full max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 flex items-center justify-center lg:justify-end pointer-events-none">
+      <div className="w-full max-w-7xl mx-auto px-0 sm:px-8 lg:px-12 flex items-end sm:items-center justify-center lg:justify-end pointer-events-none">
         <div
-          className="pointer-events-auto relative w-full max-w-[440px] max-h-[92vh] overflow-y-auto rounded-2xl bg-white border border-slate-200 p-8 shadow-xl text-slate-800 animate-in slide-in-from-right-8 duration-300"
+          role="dialog"
+          aria-modal="true"
+          className="pointer-events-auto relative w-full sm:max-w-[440px] max-h-[92dvh] overflow-y-auto overscroll-contain rounded-t-3xl sm:rounded-2xl bg-white border-t sm:border border-slate-200 px-5 pt-7 pb-[max(1.25rem,env(safe-area-inset-bottom))] min-[400px]:px-6 sm:p-8 shadow-xl text-slate-800 animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:slide-in-from-right-8 duration-300"
           onClick={(e) => e.stopPropagation()}
         >
+          <div className="sm:hidden absolute top-2.5 left-1/2 -translate-x-1/2 w-10 h-1 rounded-full bg-slate-200" />
+
           {/* Close Button */}
           <button
-            className="absolute top-5 right-5 p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+            className="absolute top-4 right-4 sm:top-5 sm:right-5 p-2 sm:p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
             onClick={onClose}
             title="Cerrar"
           >
@@ -401,7 +416,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLogin
           </button>
 
           {/* Top Konta Logo */}
-          <div className="flex justify-center mb-4">
+          <div className="flex justify-center mb-3 sm:mb-4">
             <KontaLogo size={42} showText={true} textColor="#0f172a" />
           </div>
 
@@ -411,7 +426,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLogin
           {view === 'login' && (
             <>
               <div className="text-center mb-5">
-                <h2 className="text-2xl font-bold tracking-tight text-slate-900">Iniciar Sesión</h2>
+                <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">Iniciar Sesión</h2>
                 <p className="mt-1.5 text-xs text-slate-500 leading-relaxed max-w-[280px] mx-auto">
                   Accede a tu plataforma contable en la nube, cartera y reportes por terceros.
                 </p>
@@ -474,8 +489,10 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLogin
                   <Mail size={18} className="text-slate-400 shrink-0" />
                   <input
                     type="text"
-                    className="w-full bg-transparent text-sm text-slate-800 placeholder-slate-400 outline-none ml-2.5"
+                    className="w-full min-w-0 bg-transparent text-base sm:text-sm text-slate-800 placeholder-slate-400 outline-none ml-2.5"
                     placeholder="Usuario o correo electrónico"
+                    autoComplete="username"
+                    autoCapitalize="none"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                     required
@@ -486,8 +503,9 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLogin
                   <Lock size={18} className="text-slate-400 shrink-0" />
                   <input
                     type={showPassword ? 'text' : 'password'}
-                    className="w-full bg-transparent text-sm text-slate-800 placeholder-slate-400 outline-none ml-2.5"
+                    className="w-full min-w-0 bg-transparent text-base sm:text-sm text-slate-800 placeholder-slate-400 outline-none ml-2.5"
                     placeholder="Contraseña"
+                    autoComplete="current-password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
@@ -519,7 +537,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLogin
                 {/* Main Action Button */}
                 <button
                   type="submit"
-                  className="w-full mt-1.5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-medium text-xs shadow-xs transition-colors active:scale-[0.99] disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2"
+                  className="w-full mt-1.5 py-3 sm:py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-medium text-sm sm:text-xs shadow-xs transition-colors active:scale-[0.99] disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2"
                   disabled={loading}
                 >
                   {loading ? (
@@ -567,7 +585,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLogin
               </div>
 
               <div className="text-center mb-5">
-                <h2 className="text-2xl font-bold tracking-tight text-slate-900">Regístrate en Konta</h2>
+                <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">Regístrate en Konta</h2>
                 <p className="mt-1.5 text-xs text-slate-500 leading-relaxed max-w-[300px] mx-auto">
                   Crea tu cuenta de acceso para gestionar tu catálogo PUC, cartera y terceros.
                 </p>
@@ -630,7 +648,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLogin
                   <User size={17} className="text-slate-400 shrink-0" />
                   <input
                     type="text"
-                    className="w-full bg-transparent text-sm text-slate-800 placeholder-slate-400 outline-none ml-2.5"
+                    className="w-full min-w-0 bg-transparent text-base sm:text-sm text-slate-800 placeholder-slate-400 outline-none ml-2.5"
                     placeholder="Nombre completo"
                     value={regFullName}
                     onChange={(e) => setRegFullName(e.target.value)}
@@ -643,7 +661,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLogin
                     <UserPlus size={17} className="text-slate-400 shrink-0" />
                     <input
                       type="text"
-                      className="w-full bg-transparent text-sm text-slate-800 placeholder-slate-400 outline-none ml-2"
+                      className="w-full min-w-0 bg-transparent text-base sm:text-sm text-slate-800 placeholder-slate-400 outline-none ml-2"
                       placeholder="Usuario"
                       value={regUsername}
                       onChange={(e) => setRegUsername(e.target.value)}
@@ -655,7 +673,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLogin
                     <Phone size={17} className="text-slate-400 shrink-0" />
                     <input
                       type="tel"
-                      className="w-full bg-transparent text-sm text-slate-800 placeholder-slate-400 outline-none ml-2"
+                      className="w-full min-w-0 bg-transparent text-base sm:text-sm text-slate-800 placeholder-slate-400 outline-none ml-2"
                       placeholder="Teléfono"
                       value={regPhone}
                       onChange={(e) => setRegPhone(e.target.value)}
@@ -667,7 +685,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLogin
                   <Mail size={17} className="text-slate-400 shrink-0" />
                   <input
                     type="email"
-                    className="w-full bg-transparent text-sm text-slate-800 placeholder-slate-400 outline-none ml-2.5"
+                    className="w-full min-w-0 bg-transparent text-base sm:text-sm text-slate-800 placeholder-slate-400 outline-none ml-2.5"
                     placeholder="Correo electrónico"
                     value={regEmail}
                     onChange={(e) => setRegEmail(e.target.value)}
@@ -679,7 +697,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLogin
                   <Lock size={17} className="text-slate-400 shrink-0" />
                   <input
                     type={showRegPassword ? 'text' : 'password'}
-                    className="w-full bg-transparent text-sm text-slate-800 placeholder-slate-400 outline-none ml-2.5"
+                    className="w-full min-w-0 bg-transparent text-base sm:text-sm text-slate-800 placeholder-slate-400 outline-none ml-2.5"
                     placeholder="Contraseña (mínimo 6 car.)"
                     value={regPassword}
                     onChange={(e) => setRegPassword(e.target.value)}
@@ -699,7 +717,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLogin
                   <Lock size={17} className="text-slate-400 shrink-0" />
                   <input
                     type={showRegConfirmPassword ? 'text' : 'password'}
-                    className="w-full bg-transparent text-sm text-slate-800 placeholder-slate-400 outline-none ml-2.5"
+                    className="w-full min-w-0 bg-transparent text-base sm:text-sm text-slate-800 placeholder-slate-400 outline-none ml-2.5"
                     placeholder="Confirmar contraseña"
                     value={regConfirmPassword}
                     onChange={(e) => setRegConfirmPassword(e.target.value)}
@@ -717,7 +735,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLogin
 
                 <button
                   type="submit"
-                  className="w-full mt-2 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-medium text-xs shadow-xs transition-colors active:scale-[0.99] disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2"
+                  className="w-full mt-2 py-3 sm:py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-medium text-sm sm:text-xs shadow-xs transition-colors active:scale-[0.99] disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2"
                   disabled={loading}
                 >
                   {loading ? (
@@ -764,7 +782,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLogin
               </div>
 
               <div className="text-center mb-5">
-                <h2 className="text-2xl font-bold tracking-tight text-slate-900">¿Olvidaste tu clave?</h2>
+                <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">¿Olvidaste tu clave?</h2>
                 <p className="mt-1.5 text-xs text-slate-500 leading-relaxed max-w-[300px] mx-auto">
                   Ingresa tu correo o usuario registrado para enviarte un código numérico de 6 dígitos.
                 </p>
@@ -781,7 +799,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLogin
                   <Mail size={18} className="text-slate-400 shrink-0" />
                   <input
                     type="text"
-                    className="w-full bg-transparent text-sm text-slate-800 placeholder-slate-400 outline-none ml-2.5"
+                    className="w-full min-w-0 bg-transparent text-base sm:text-sm text-slate-800 placeholder-slate-400 outline-none ml-2.5"
                     placeholder="Correo o nombre de usuario"
                     value={recoveryEmail}
                     onChange={(e) => setRecoveryEmail(e.target.value)}
@@ -792,7 +810,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLogin
 
                 <button
                   type="submit"
-                  className="w-full mt-2 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-medium text-xs shadow-xs transition-colors active:scale-[0.99] disabled:opacity-50 cursor-pointer"
+                  className="w-full mt-2 py-3 sm:py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-medium text-sm sm:text-xs shadow-xs transition-colors active:scale-[0.99] disabled:opacity-50 cursor-pointer"
                   disabled={loading}
                 >
                   {loading ? 'Enviando código...' : 'Enviar código de 6 dígitos'}
@@ -829,7 +847,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLogin
               </div>
 
               <div className="text-center mb-5">
-                <h2 className="text-2xl font-bold tracking-tight text-slate-900">Nueva Contraseña</h2>
+                <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">Nueva Contraseña</h2>
                 <p className="mt-1.5 text-xs text-slate-500 leading-relaxed max-w-[300px] mx-auto">
                   Introduce el código de 6 dígitos recibido en tu correo y define tu nueva contraseña.
                 </p>
@@ -870,7 +888,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLogin
                   <Lock size={18} className="text-slate-400 shrink-0" />
                   <input
                     type={showNewPassword ? 'text' : 'password'}
-                    className="w-full bg-transparent text-sm text-slate-800 placeholder-slate-400 outline-none ml-2.5"
+                    className="w-full min-w-0 bg-transparent text-base sm:text-sm text-slate-800 placeholder-slate-400 outline-none ml-2.5"
                     placeholder="Nueva contraseña (min 6 car.)"
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
@@ -891,7 +909,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLogin
                   <Lock size={18} className="text-slate-400 shrink-0" />
                   <input
                     type={showConfirmPassword ? 'text' : 'password'}
-                    className="w-full bg-transparent text-sm text-slate-800 placeholder-slate-400 outline-none ml-2.5"
+                    className="w-full min-w-0 bg-transparent text-base sm:text-sm text-slate-800 placeholder-slate-400 outline-none ml-2.5"
                     placeholder="Confirmar nueva contraseña"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
@@ -909,7 +927,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLogin
 
                 <button
                   type="submit"
-                  className="w-full mt-2 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-medium text-xs shadow-xs transition-colors active:scale-[0.99] disabled:opacity-50 cursor-pointer"
+                  className="w-full mt-2 py-3 sm:py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-medium text-sm sm:text-xs shadow-xs transition-colors active:scale-[0.99] disabled:opacity-50 cursor-pointer"
                   disabled={loading}
                 >
                   {loading ? 'Restableciendo...' : 'Restablecer contraseña'}
@@ -949,7 +967,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLogin
                   setPassword('');
                   switchView('login');
                 }}
-                className="w-full py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-medium text-xs shadow-xs transition-colors active:scale-[0.99] cursor-pointer"
+                className="w-full py-3 sm:py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-medium text-sm sm:text-xs shadow-xs transition-colors active:scale-[0.99] cursor-pointer"
               >
                 Iniciar Sesión Ahora
               </button>

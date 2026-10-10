@@ -98,6 +98,25 @@ export const KontaChatWidget: React.FC<KontaChatWidgetProps> = ({
     }
   }, [isOpen, messages, isTyping]);
 
+  // En móvil el chat ocupa toda la pantalla: bloquear el scroll del fondo y cerrar con Escape
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setIsOpen(false);
+    };
+    window.addEventListener('keydown', onKeyDown);
+
+    const isMobile = window.matchMedia('(max-width: 639px)').matches;
+    const prevOverflow = document.body.style.overflow;
+    if (isMobile) document.body.style.overflow = 'hidden';
+
+    return () => {
+      window.removeEventListener('keydown', onKeyDown);
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [isOpen]);
+
   const handleCopy = (id: string, text: string) => {
     navigator.clipboard?.writeText(text);
     setCopiedId(id);
@@ -162,20 +181,24 @@ export const KontaChatWidget: React.FC<KontaChatWidgetProps> = ({
     <>
       {/* Floating State-of-the-Art AI Chat Panel matching exact user screenshot */}
       {isOpen && (
-        <div className="fixed bottom-22 right-4 sm:right-6 z-50 w-[94vw] sm:w-[460px] md:w-[490px] h-[640px] max-h-[85vh] rounded-[36px] bg-[#f3f3f6] border border-white/90 shadow-2xl shadow-slate-900/25 flex flex-col overflow-hidden animate-in slide-in-from-bottom-5 duration-300 font-sans text-slate-800">
+        <div
+          role="dialog"
+          aria-label="Asistente Konta AI"
+          className="fixed inset-0 h-dvh w-full rounded-none border-0 sm:inset-auto sm:bottom-24 sm:right-6 sm:w-[420px] md:w-[460px] lg:w-[490px] sm:h-[640px] sm:max-h-[calc(100dvh-8rem)] sm:rounded-[32px] sm:border sm:border-white/90 z-50 bg-[#f3f3f6] shadow-2xl shadow-slate-900/25 flex flex-col overflow-hidden animate-in slide-in-from-bottom-5 duration-300 font-sans text-slate-800"
+        >
           {/* Top Header matching reference */}
-          <div className="px-6 pt-5 pb-3 flex items-center justify-between shrink-0 bg-transparent border-b border-slate-200/50">
-            <div className="flex items-center gap-2.5">
+          <div className="px-4 sm:px-6 pt-[max(0.875rem,env(safe-area-inset-top))] sm:pt-5 pb-3 flex items-center justify-between gap-2 shrink-0 bg-white/60 sm:bg-transparent border-b border-slate-200/50">
+            <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
               <KontaLogo size={28} showText={true} textColor="#0f172a" />
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 bg-white/80 px-2 py-0.5 rounded-full border border-slate-200/70 shadow-2xs">
+              <span className="hidden min-[380px]:inline text-[10px] font-bold uppercase tracking-wider text-slate-500 bg-white/80 px-2 py-0.5 rounded-full border border-slate-200/70 shadow-2xs whitespace-nowrap">
                 AI COPILOT
               </span>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 shrink-0">
               <button
                 onClick={handleResetChat}
-                className="w-8 h-8 rounded-full bg-white/70 hover:bg-white text-slate-500 hover:text-slate-800 flex items-center justify-center transition-colors cursor-pointer border border-slate-200/50 shadow-2xs"
+                className="w-10 h-10 sm:w-8 sm:h-8 rounded-full bg-white/70 hover:bg-white text-slate-500 hover:text-slate-800 flex items-center justify-center transition-colors cursor-pointer border border-slate-200/50 shadow-2xs"
                 title="Reiniciar conversación"
               >
                 <RotateCcw size={14} />
@@ -183,7 +206,7 @@ export const KontaChatWidget: React.FC<KontaChatWidgetProps> = ({
 
               <button
                 onClick={() => setIsOpen(false)}
-                className="w-8 h-8 rounded-full bg-white/70 hover:bg-white text-slate-500 hover:text-slate-800 flex items-center justify-center transition-colors cursor-pointer border border-slate-200/50 shadow-2xs"
+                className="w-10 h-10 sm:w-8 sm:h-8 rounded-full bg-white/70 hover:bg-white text-slate-500 hover:text-slate-800 flex items-center justify-center transition-colors cursor-pointer border border-slate-200/50 shadow-2xs"
                 title="Cerrar chat"
               >
                 <X size={16} />
@@ -192,13 +215,13 @@ export const KontaChatWidget: React.FC<KontaChatWidgetProps> = ({
           </div>
 
           {/* Conversational Chat Flow Area */}
-          <div className="flex-1 overflow-y-auto px-5 sm:px-6 py-4 space-y-4 text-xs">
+          <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-4 sm:px-6 py-4 space-y-4 text-xs">
             {messages.map((msg) => (
               <div key={msg.id} className="space-y-2">
                 {/* User Message (Right-aligned bubble with avatar) */}
                 {msg.sender === 'user' ? (
                   <div className="flex items-center justify-end gap-2.5">
-                    <div className="bg-[#e7e7ec] text-slate-800 text-[13px] font-normal px-4 py-2.5 rounded-2xl rounded-tr-xs max-w-[82%] leading-relaxed shadow-2xs">
+                    <div className="bg-[#e7e7ec] text-slate-800 text-sm sm:text-[13px] font-normal px-4 py-2.5 rounded-2xl rounded-tr-xs max-w-[80%] leading-relaxed shadow-2xs break-words">
                       {msg.text}
                     </div>
 
@@ -222,7 +245,7 @@ export const KontaChatWidget: React.FC<KontaChatWidgetProps> = ({
                     )}
 
                     {/* Conversational Text Bubble */}
-                    <div className="bg-white/85 border border-slate-200/80 text-slate-800 text-[13px] font-normal px-4 py-3 rounded-2xl rounded-tl-xs max-w-[92%] leading-relaxed shadow-xs">
+                    <div className="bg-white/85 border border-slate-200/80 text-slate-800 text-sm sm:text-[13px] font-normal px-4 py-3 rounded-2xl rounded-tl-xs max-w-[92%] leading-relaxed shadow-xs break-words">
                       {renderFormattedMessage(msg.text)}
                     </div>
 
@@ -280,45 +303,45 @@ export const KontaChatWidget: React.FC<KontaChatWidgetProps> = ({
           </div>
 
           {/* Quick suggestions pills above input matching photo */}
-          <div className="px-5 py-2 flex items-center gap-2 overflow-x-auto no-scrollbar shrink-0 border-t border-slate-200/60 bg-white/40">
+          <div className="px-4 sm:px-5 py-2 flex items-center gap-2 overflow-x-auto overscroll-x-contain snap-x no-scrollbar shrink-0 border-t border-slate-200/60 bg-white/40">
             <button
               onClick={() => handleSendMessage('¿Cómo se registran los préstamos a asociados y la cuenta PUC 136505?')}
-              className="px-3 py-1 rounded-full bg-white hover:bg-slate-100 text-slate-700 text-[11px] font-medium border border-slate-200/80 whitespace-nowrap cursor-pointer transition-colors shadow-2xs"
+              className="snap-start px-3 py-1.5 sm:py-1 rounded-full bg-white hover:bg-slate-100 text-slate-700 text-xs sm:text-[11px] font-medium border border-slate-200/80 whitespace-nowrap cursor-pointer transition-colors shadow-2xs"
             >
               💰 Préstamos Asociados
             </button>
 
             <button
               onClick={() => handleSendMessage('¿Cómo funciona el módulo de Cartera y Aging?')}
-              className="px-3 py-1 rounded-full bg-white hover:bg-slate-100 text-slate-700 text-[11px] font-medium border border-slate-200/80 whitespace-nowrap cursor-pointer transition-colors shadow-2xs"
+              className="snap-start px-3 py-1.5 sm:py-1 rounded-full bg-white hover:bg-slate-100 text-slate-700 text-xs sm:text-[11px] font-medium border border-slate-200/80 whitespace-nowrap cursor-pointer transition-colors shadow-2xs"
             >
               📊 Cartera & Aging
             </button>
 
             <button
               onClick={() => handleSendMessage('¿Cómo emitir Documento Soporte a no obligados ante la DIAN?')}
-              className="px-3 py-1 rounded-full bg-white hover:bg-slate-100 text-slate-700 text-[11px] font-medium border border-slate-200/80 whitespace-nowrap cursor-pointer transition-colors shadow-2xs"
+              className="snap-start px-3 py-1.5 sm:py-1 rounded-full bg-white hover:bg-slate-100 text-slate-700 text-xs sm:text-[11px] font-medium border border-slate-200/80 whitespace-nowrap cursor-pointer transition-colors shadow-2xs"
             >
               📄 Doc. Soporte DIAN
             </button>
 
             <button
               onClick={() => handleSendMessage('¿Cómo genero Balance de Comprobación por terceros bajo NIIF?')}
-              className="px-3 py-1 rounded-full bg-white hover:bg-slate-100 text-slate-700 text-[11px] font-medium border border-slate-200/80 whitespace-nowrap cursor-pointer transition-colors shadow-2xs"
+              className="snap-start px-3 py-1.5 sm:py-1 rounded-full bg-white hover:bg-slate-100 text-slate-700 text-xs sm:text-[11px] font-medium border border-slate-200/80 whitespace-nowrap cursor-pointer transition-colors shadow-2xs"
             >
               📑 Balances NIIF
             </button>
 
             <button
               onClick={() => handleSendMessage('Quiero hablar con un asesor comercial por WhatsApp')}
-              className="px-3 py-1 rounded-full bg-white hover:bg-slate-100 text-slate-700 text-[11px] font-medium border border-slate-200/80 whitespace-nowrap cursor-pointer transition-colors shadow-2xs"
+              className="snap-start px-3 py-1.5 sm:py-1 rounded-full bg-white hover:bg-slate-100 text-slate-700 text-xs sm:text-[11px] font-medium border border-slate-200/80 whitespace-nowrap cursor-pointer transition-colors shadow-2xs"
             >
               💬 WhatsApp
             </button>
           </div>
 
           {/* Bottom Floating Pill Input Bar matching exact screenshot */}
-          <div className="p-4 pt-1 bg-transparent shrink-0">
+          <div className="px-3 sm:px-4 pt-1 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:pb-4 bg-transparent shrink-0">
             <form
               onSubmit={(e) => {
                 e.preventDefault();
@@ -339,8 +362,10 @@ export const KontaChatWidget: React.FC<KontaChatWidgetProps> = ({
               {/* Text Input */}
               <input
                 type="text"
-                className="flex-1 bg-transparent text-[13px] text-slate-800 placeholder-slate-400 outline-none"
+                className="flex-1 min-w-0 bg-transparent text-base sm:text-[13px] text-slate-800 placeholder-slate-400 outline-none"
                 placeholder="Escribe tu mensaje o consulta..."
+                enterKeyHint="send"
+                autoComplete="off"
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
               />
@@ -365,7 +390,7 @@ export const KontaChatWidget: React.FC<KontaChatWidgetProps> = ({
       {/* Floating Chat Button at bottom-right */}
       <button
         onClick={() => setIsOpen((prev) => !prev)}
-        className="fixed bottom-6 right-6 z-50 w-12 h-12 rounded-2xl bg-[#5850ec] hover:bg-[#4b43e0] text-white shadow-xl shadow-indigo-600/35 flex items-center justify-center cursor-pointer hover:scale-110 active:scale-95 transition-all duration-300 group"
+        className={`${isOpen ? 'hidden sm:flex' : 'flex'} fixed bottom-[max(1rem,env(safe-area-inset-bottom))] right-4 sm:bottom-6 sm:right-6 z-50 w-12 h-12 rounded-2xl bg-[#5850ec] hover:bg-[#4b43e0] text-white shadow-xl shadow-indigo-600/35 items-center justify-center cursor-pointer hover:scale-110 active:scale-95 transition-all duration-300 group`}
         title={isOpen ? 'Cerrar chat' : 'Asistente Konta AI'}
         aria-label="Asistente Konta"
       >
