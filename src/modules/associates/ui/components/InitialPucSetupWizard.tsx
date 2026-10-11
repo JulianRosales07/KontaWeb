@@ -986,7 +986,7 @@ export const InitialPucSetupWizard: React.FC<InitialPucSetupWizardProps> = ({
                 </div>
 
                 <div className="overflow-x-auto">
-                  <table className="w-full text-left text-xs">
+                  <table className="table-stack w-full text-left text-xs">
                     <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase font-semibold text-[11px]">
                       <tr>
                         <th className="py-2.5 px-4">Cuenta P.U.C.</th>

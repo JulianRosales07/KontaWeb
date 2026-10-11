@@ -496,7 +496,7 @@ export const QuotaTemplateConfigView: React.FC<QuotaTemplateConfigViewProps> = (
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs">
+          <table className="table-stack w-full text-left text-xs">
             <thead className="bg-slate-100/80 text-slate-600 border-b border-slate-200 font-semibold text-[11px]">
               <tr>
                 <th className="py-2.5 px-3 w-10 text-center">#</th>

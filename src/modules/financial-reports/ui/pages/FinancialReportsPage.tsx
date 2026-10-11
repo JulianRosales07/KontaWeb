@@ -159,7 +159,7 @@ const FinancialReportsView: React.FC = () => {
           </div>
 
           <div className="table-responsive">
-            <table className="enterprise-table">
+            <table className="table-stack enterprise-table">
               <thead>
                 <tr>
                   <th>CUENTA P.U.C.</th>
@@ -266,7 +266,7 @@ const FinancialReportsView: React.FC = () => {
             </div>
 
             <div className="table-responsive">
-              <table className="enterprise-table">
+              <table className="table-stack enterprise-table">
                 <thead>
                   <tr>
                     <th>TERCERO / RAZÓN SOCIAL</th>
@@ -371,7 +371,7 @@ const FinancialReportsView: React.FC = () => {
               <h3 className="card-title">1. Detalle de Activos a Nivel de Terceros</h3>
             </div>
             <div className="table-responsive">
-              <table className="enterprise-table">
+              <table className="table-stack enterprise-table">
                 <thead>
                   <tr>
                     <th>CUENTA</th>
@@ -406,7 +406,7 @@ const FinancialReportsView: React.FC = () => {
               <h3 className="card-title">2. Detalle de Pasivos a Nivel de Terceros</h3>
             </div>
             <div className="table-responsive">
-              <table className="enterprise-table">
+              <table className="table-stack enterprise-table">
                 <thead>
                   <tr>
                     <th>CUENTA</th>

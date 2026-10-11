@@ -242,7 +242,7 @@ export const VoucherDetailModal: React.FC<{ voucher: JournalVoucher | null; onCl
   };
 
   const linesTable = (printable: boolean) => (
-    <table className={printable ? undefined : 'w-full min-w-[720px] border-collapse text-sm'}>
+    <table className={printable ? undefined : 'table-stack w-full min-w-[720px] border-collapse text-sm'}>
       <thead className={printable ? undefined : 'bg-slate-800 text-white'}>
         <tr>
           {['Código cuenta', 'Nombre cuenta', 'Tercero', 'Detalle'].map((h) => (

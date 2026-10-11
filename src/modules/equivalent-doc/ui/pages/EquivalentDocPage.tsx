@@ -380,7 +380,7 @@ const EquivalentDocView: React.FC = () => {
               </p>
             ) : (
               <div className="table-responsive">
-                <table className="enterprise-table">
+                <table className="table-stack enterprise-table">
                   <thead>
                     <tr>
                       <th>NÚMERO</th>

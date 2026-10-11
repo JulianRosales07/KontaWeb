@@ -197,7 +197,7 @@ export const CreateLoanModal: React.FC<Props> = ({ open, onClose, onCreated, ini
                 <Mini label="Total a pagar" value={formatCOP(preview.totalPayable)} />
               </div>
               <div className="table-scroll max-h-[50dvh] overflow-y-auto rounded-lg border border-slate-200">
-                <table className="w-full min-w-[620px] text-sm">
+                <table className="table-stack w-full min-w-[620px] text-sm">
                   <thead className="sticky top-0 bg-slate-50 text-[11px] uppercase tracking-wide text-slate-500">
                     <tr>
                       <th className="px-3 py-2 text-left">#</th>

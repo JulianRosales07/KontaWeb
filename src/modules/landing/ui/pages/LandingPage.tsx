@@ -128,24 +128,29 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-gradient-to-tr from-amber-50/40 to-transparent rounded-full blur-3xl pointer-events-none" />
 
         {/* Top Navigation Bar */}
-        <header className="relative z-30 max-w-7xl mx-auto px-6 sm:px-10 lg:px-12 py-5 flex items-center justify-between">
+        <header className="relative z-30 max-w-7xl mx-auto px-4 min-[400px]:px-6 sm:px-10 lg:px-12 py-4 sm:py-5 flex items-center justify-between gap-3">
           {/* Brand Logo */}
           <div
-            className="flex items-center cursor-pointer transition-transform hover:scale-[1.02]"
+            className="flex min-w-0 shrink-0 items-center cursor-pointer transition-transform hover:scale-[1.02]"
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
           >
-            <KontaLogo size={38} showText={true} textColor="#0f172a" />
+            <span className="sm:hidden">
+              <KontaLogo size={32} showText={true} textColor="#0f172a" />
+            </span>
+            <span className="hidden sm:block">
+              <KontaLogo size={38} showText={true} textColor="#0f172a" />
+            </span>
           </div>
 
           {/* Right Action Controls matching reference photo */}
-          <div className="flex items-center gap-5 sm:gap-6">
+          <div className="flex shrink-0 items-center gap-2 min-[420px]:gap-4 sm:gap-6">
             {/* ADQUIRIR Solid Pill Button matching photo */}
             <motion.button
               onClick={onOpenLogin}
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.96 }}
               transition={{ duration: 0.14, ease: EASE_OUT }}
-              className="px-6 py-2.5 bg-[#5850ec] hover:bg-[#4b43e0] text-white text-xs font-bold tracking-wider uppercase rounded-full shadow-md shadow-indigo-500/20 hover:shadow-indigo-500/30 transition-colors cursor-pointer hover-glow"
+              className="px-4 py-2 sm:px-6 sm:py-2.5 whitespace-nowrap bg-[#5850ec] hover:bg-[#4b43e0] text-white text-[11px] sm:text-xs font-bold tracking-wider uppercase rounded-full shadow-md shadow-indigo-500/20 hover:shadow-indigo-500/30 transition-colors cursor-pointer hover-glow"
             >
               ADQUIRIR
             </motion.button>
@@ -156,7 +161,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               whileHover={{ y: -1 }}
               whileTap={{ scale: 0.96 }}
               transition={{ duration: 0.14, ease: EASE_OUT }}
-              className="text-sm font-semibold text-[#3b82f6] hover:text-[#2563eb] underline underline-offset-2 transition-colors cursor-pointer"
+              className="hidden min-[420px]:block whitespace-nowrap text-sm font-semibold text-[#3b82f6] hover:text-[#2563eb] underline underline-offset-2 transition-colors cursor-pointer"
             >
               Ingresar
             </motion.button>
@@ -167,7 +172,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               whileHover={{ scale: 1.08 }}
               whileTap={{ scale: 0.92 }}
               transition={{ duration: 0.14, ease: EASE_OUT }}
-              className="p-1.5 text-slate-800 hover:text-indigo-600 transition-colors cursor-pointer rounded-lg hover:bg-slate-100"
+              className="shrink-0 p-1.5 -mr-1.5 text-slate-800 hover:text-indigo-600 transition-colors cursor-pointer rounded-lg hover:bg-slate-100"
               title="Abrir menú"
               aria-label="Abrir menú"
             >

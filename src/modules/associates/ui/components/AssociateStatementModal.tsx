@@ -303,7 +303,7 @@ export const AssociateStatementModal: React.FC<AssociateStatementModalProps> = (
                 </div>
 
                 <div className="rounded-xl border border-slate-200 overflow-x-auto overscroll-x-contain">
-                  <table className="w-full min-w-[640px] text-xs">
+                  <table className="table-stack w-full min-w-[640px] text-xs">
                     <thead>
                       <tr className="bg-slate-50 text-slate-600 border-b border-slate-200">
                         <th className="py-2.5 px-3 text-left font-semibold">N° Recibo</th>

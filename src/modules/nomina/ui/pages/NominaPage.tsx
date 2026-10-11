@@ -129,7 +129,7 @@ export const NominaPage: React.FC<NominaPageProps> = ({
             </div>
 
             <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-x-auto overscroll-x-contain">
-              <table className="w-full min-w-[760px] text-left text-xs">
+              <table className="table-stack w-full min-w-[760px] text-left text-xs">
                 <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase font-semibold">
                   <tr>
                     <th className="py-3 px-5">Colaborador</th>

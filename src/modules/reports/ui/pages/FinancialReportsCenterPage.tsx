@@ -526,7 +526,7 @@ const ReportTable: React.FC<{ report: FinancialReport; printable?: boolean; onRo
 
   return (
     <div className="table-scroll rounded-lg border border-slate-200">
-      <table className="w-full border-collapse text-sm" style={{ minWidth: Math.max(640, cols.length * 120) }}>
+      <table className="table-stack w-full border-collapse text-sm" style={{ minWidth: Math.max(640, cols.length * 120) }}>
         <thead className="sticky top-0 bg-slate-800 text-white">
           <tr>
             {cols.map((c) => (

@@ -310,7 +310,7 @@ const LedgerModal: React.FC<{ account: TrialBalanceItem | null; from: string; to
             <StatCard label="Saldo final" value={formatCOP(ledger.finalBalance, '$0')} tone="primary" />
           </div>
           <div className="table-scroll rounded-lg border border-slate-200">
-            <table className="w-full min-w-[760px] text-sm">
+            <table className="table-stack w-full min-w-[760px] text-sm">
               <thead className="bg-slate-50 text-[11px] uppercase tracking-wide text-slate-500">
                 <tr>
                   <th className="px-3 py-2 text-left">Fecha</th>

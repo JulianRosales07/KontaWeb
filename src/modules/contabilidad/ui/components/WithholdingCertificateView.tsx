@@ -284,7 +284,7 @@ export const WithholdingCertificateView: React.FC = () => {
 
             {/* Concept Coverage Table */}
             <div className="rounded-2xl border border-slate-200 overflow-x-auto overscroll-x-contain text-xs">
-              <table className="w-full min-w-[560px] text-left">
+              <table className="table-stack w-full min-w-[560px] text-left">
                 <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 font-semibold">
                   <tr>
                     <th className="py-2.5 px-3">Cuenta PUC</th>

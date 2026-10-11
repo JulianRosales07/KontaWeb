@@ -68,24 +68,30 @@ export const Modal: React.FC<ModalProps> = ({
         aria-modal="true"
         className={`relative flex h-[100dvh] w-full flex-col bg-white shadow-2xl sm:h-auto sm:max-h-[min(92dvh,900px)] sm:rounded-2xl ${SIZES[size]} ${className}`}
       >
-        <div className="flex shrink-0 items-start justify-between gap-3 border-b border-slate-200 px-4 py-3.5 sm:px-6">
+        <div className="flex shrink-0 items-start justify-between gap-3 border-b border-slate-200 px-4 pb-3.5 pt-[max(0.875rem,env(safe-area-inset-top))] sm:px-6 sm:pt-3.5">
           <div className="min-w-0">
-            <h3 className="text-base font-bold text-slate-900">{title}</h3>
+            <h3 className="break-words text-base font-bold text-slate-900">{title}</h3>
             {subtitle && <p className="mt-0.5 text-xs text-slate-500">{subtitle}</p>}
           </div>
           <button
             type="button"
             onClick={onClose}
             disabled={locked}
-            className="shrink-0 rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-40 cursor-pointer"
+            className="-m-1 shrink-0 rounded-lg p-2.5 text-slate-400 sm:m-0 sm:p-1.5 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-40 cursor-pointer"
             aria-label="Cerrar"
           >
             <X size={18} />
           </button>
         </div>
-        <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-4 py-4 sm:px-6">{children}</div>
+        <div
+          className={`min-h-0 flex-1 overflow-y-auto overflow-x-hidden overscroll-contain px-4 pt-4 sm:px-6 sm:pb-4 ${
+            footer ? 'pb-4' : 'pb-[max(1rem,env(safe-area-inset-bottom))]'
+          }`}
+        >
+          {children}
+        </div>
         {footer && (
-          <div className="flex shrink-0 flex-col-reverse gap-2 border-t border-slate-200 px-4 py-3 sm:flex-row sm:justify-end sm:px-6 [&>*]:w-full sm:[&>*]:w-auto">
+          <div className="flex shrink-0 flex-col-reverse gap-2 border-t border-slate-200 px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:flex-row sm:justify-end sm:px-6 sm:pb-3 [&>*]:w-full sm:[&>*]:w-auto">
             {footer}
           </div>
         )}

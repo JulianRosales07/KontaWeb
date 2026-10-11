@@ -97,7 +97,7 @@ export const MonthlyReportImporter: React.FC<{ onImported: () => void }> = ({ on
             <div className="min-w-0 rounded-xl border border-slate-200 bg-white p-4">
               <h4 className="mb-3 text-sm font-bold text-slate-800">Conciliación: reportes del sistema vs. Excel</h4>
               <div className="table-scroll rounded-lg border border-slate-200">
-                <table className="w-full min-w-[760px] border-collapse text-sm">
+                <table className="table-stack w-full min-w-[760px] border-collapse text-sm">
                   <thead className="bg-slate-800 text-white">
                     <tr>
                       {['', 'Hoja Excel', 'Reporte', 'Concepto'].map((h) => (
@@ -138,7 +138,7 @@ export const MonthlyReportImporter: React.FC<{ onImported: () => void }> = ({ on
                 Comprobantes {result.dryRun ? 'que se crearán' : 'creados'} ({result.vouchers.length})
               </summary>
               <div className="table-scroll mt-3 rounded-lg border border-slate-200">
-                <table className="w-full min-w-[640px] border-collapse text-sm">
+                <table className="table-stack w-full min-w-[640px] border-collapse text-sm">
                   <thead className="bg-slate-100 text-slate-700">
                     <tr>
                       <th className="px-3 py-2 text-left text-[11px] font-bold uppercase">Número</th>

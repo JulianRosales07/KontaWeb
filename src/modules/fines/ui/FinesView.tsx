@@ -199,7 +199,7 @@ const FinesList: React.FC<{ types: FineType[]; associates: AssociateSummary[]; c
       )}
 
       <div className="table-scroll rounded-xl border border-slate-200 bg-white">
-        <table className="w-full min-w-[860px] border-collapse text-sm">
+        <table className="table-stack w-full min-w-[860px] border-collapse text-sm">
           <thead className="bg-slate-800 text-white">
             <tr>
               {canManage && (
