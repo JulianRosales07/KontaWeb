@@ -146,13 +146,13 @@ export const AccountingClosingView: React.FC = () => {
       {/* Top Banner / Notification */}
       {notification && (
         <div
-          className={`p-4 rounded-2xl border flex items-center justify-between shadow-xs ${
+          className={`p-4 rounded-2xl border flex items-start sm:items-center justify-between gap-3 shadow-xs ${
             notification.type === 'success'
               ? 'bg-emerald-50/90 border-emerald-200 text-emerald-900'
               : 'bg-rose-50/90 border-rose-200 text-rose-900'
           }`}
         >
-          <div className="flex items-center gap-3">
+          <div className="flex min-w-0 items-center gap-3">
             {notification.type === 'success' ? (
               <CheckCircle2 size={18} className="text-emerald-600 shrink-0" />
             ) : (
@@ -284,7 +284,7 @@ export const AccountingClosingView: React.FC = () => {
         {/* Closing Result Feedback Card */}
         {closingResult && (
           <div className="p-5 rounded-2xl bg-gradient-to-br from-indigo-50/80 to-purple-50/80 border border-indigo-200 text-slate-800 space-y-4 animate-in fade-in duration-200">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="flex items-center gap-2.5">
                 <div className="p-2 bg-indigo-600 text-white rounded-lg">
                   <CheckCircle2 size={16} />

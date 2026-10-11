@@ -331,10 +331,10 @@ export const InitialPucSetupWizard: React.FC<InitialPucSetupWizardProps> = ({
   if (!isOpen) return null;
 
   return createPortal(
-    <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-slate-950/70 backdrop-blur-md p-4 animate-in fade-in duration-200">
-      <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl max-w-4xl w-full flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200">
+    <div className="fixed inset-0 z-[10000] flex items-end sm:items-center justify-center bg-slate-950/70 backdrop-blur-md p-0 sm:p-4 animate-in fade-in duration-200">
+      <div className="bg-white rounded-t-3xl sm:rounded-3xl border border-slate-200 shadow-2xl max-w-4xl w-full pb-[env(safe-area-inset-bottom)] sm:pb-0 flex flex-col max-h-[92dvh] sm:max-h-[92dvh] overflow-hidden animate-in zoom-in-95 duration-200">
         {/* Wizard Top Header */}
-        <div className="px-8 py-5 border-b border-slate-100 bg-white flex items-center justify-between">
+        <div className="px-4 sm:px-8 py-4 sm:py-5 border-b border-slate-100 bg-white flex items-center justify-between flex-wrap gap-3">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center border border-slate-200">
               <Sparkles size={20} />
@@ -363,7 +363,7 @@ export const InitialPucSetupWizard: React.FC<InitialPucSetupWizardProps> = ({
         </div>
 
         {/* Wizard Progress Stepper Bar */}
-        <div className="px-8 py-3 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
+        <div className="px-4 sm:px-8 py-3 bg-slate-50 border-b border-slate-100 flex items-center justify-between flex-wrap gap-3">
           {[
             { step: 1, title: '1. Monto Cuota' },
             { step: 2, title: '2. Discriminación de Valores' },
@@ -403,7 +403,7 @@ export const InitialPucSetupWizard: React.FC<InitialPucSetupWizardProps> = ({
         </div>
 
         {/* Wizard Body Content */}
-        <div className="flex-1 overflow-y-auto p-8">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-8">
           {/* ========================================================================= */}
           {/* PASO 1: MONTO TOTAL DE LA CUOTA & CUENTA RECEPTORA                         */}
           {/* ========================================================================= */}
@@ -926,8 +926,8 @@ export const InitialPucSetupWizard: React.FC<InitialPucSetupWizardProps> = ({
                         </div>
 
                         {/* Assigned PUC Account pill */}
-                        <div className="flex items-center gap-2 shrink-0">
-                          <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-200 text-xs flex items-center gap-2 min-w-[240px]">
+                        <div className="flex items-center gap-2 w-full sm:w-auto sm:shrink-0">
+                          <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-200 text-xs flex items-center gap-2 min-w-0 flex-1 sm:flex-none sm:min-w-[240px]">
                             <span className="font-mono font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
                               {item.accountCode}
                             </span>
@@ -978,7 +978,7 @@ export const InitialPucSetupWizard: React.FC<InitialPucSetupWizardProps> = ({
 
               {/* Comprobante Preview Table */}
               <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
-                <div className="px-6 py-3.5 bg-slate-900 text-white flex items-center justify-between text-xs">
+                <div className="px-4 sm:px-6 py-3.5 bg-slate-900 text-white flex flex-wrap items-center justify-between gap-2 text-xs">
                   <span className="font-mono font-bold">Comprobante Modelo: CP-ING-00001 (Recaudo Cuota Asociado)</span>
                   <span className="px-2.5 py-0.5 bg-emerald-500 text-white rounded-full font-bold text-[10px]">
                     Partida Doble Balanceada
@@ -1047,7 +1047,7 @@ export const InitialPucSetupWizard: React.FC<InitialPucSetupWizardProps> = ({
         </div>
 
         {/* Wizard Footer Controls */}
-        <div className="px-8 py-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between">
+        <div className="px-4 sm:px-8 py-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between flex-wrap gap-3">
           <div>
             {currentStep > 1 ? (
               <button
@@ -1100,17 +1100,17 @@ export const InitialPucSetupWizard: React.FC<InitialPucSetupWizardProps> = ({
         {/* Internal Account Picker Popup in Step 2 / Step 3 */}
         {(editingItemIndex !== null || isAddingNewConcept) && (
           <div
-            className="fixed inset-0 z-[10010] flex items-center justify-center bg-slate-950/60 backdrop-blur-sm p-4 animate-in fade-in duration-150"
+            className="fixed inset-0 z-[10010] flex items-end sm:items-center justify-center bg-slate-950/60 backdrop-blur-sm p-0 sm:p-4 animate-in fade-in duration-150"
             onClick={() => {
               setEditingItemIndex(null);
               setIsAddingNewConcept(false);
             }}
           >
             <div
-              className="bg-white rounded-2xl border border-slate-200 shadow-2xl max-w-xl w-full max-h-[80vh] flex flex-col overflow-hidden animate-in zoom-in-95 duration-150"
+              className="bg-white rounded-t-2xl sm:rounded-2xl border border-slate-200 shadow-2xl max-w-xl w-full pb-[env(safe-area-inset-bottom)] sm:pb-0 max-h-[92dvh] sm:max-h-[80dvh] flex flex-col overflow-hidden animate-in zoom-in-95 duration-150"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 bg-white">
+              <div className="flex items-center justify-between flex-wrap gap-3 px-4 sm:px-6 py-4 border-b border-slate-200 bg-white">
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-indigo-50 text-indigo-700 rounded-lg border border-indigo-100">
                     <Sparkles size={20} />

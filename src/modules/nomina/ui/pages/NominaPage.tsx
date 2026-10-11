@@ -128,8 +128,8 @@ export const NominaPage: React.FC<NominaPageProps> = ({
               </button>
             </div>
 
-            <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
-              <table className="w-full text-left text-xs">
+            <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-x-auto overscroll-x-contain">
+              <table className="w-full min-w-[760px] text-left text-xs">
                 <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase font-semibold">
                   <tr>
                     <th className="py-3 px-5">Colaborador</th>
@@ -168,7 +168,7 @@ export const NominaPage: React.FC<NominaPageProps> = ({
         {/* TAB 3: LIQUIDACIÓN */}
         {activeTab === 'liquidacion' && (
           <div className="p-8 max-w-7xl mx-auto space-y-6">
-            <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
+            <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex flex-col gap-3 sm:flex-row sm:items-center justify-between">
               <div>
                 <h2 className="text-lg font-bold text-slate-900">Liquidación Periódica de Nómina</h2>
                 <p className="text-xs text-slate-500 mt-1">

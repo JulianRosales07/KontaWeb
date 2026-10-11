@@ -137,7 +137,7 @@ const FinancialReportsView: React.FC = () => {
 
       {/* Search Bar */}
       <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'flex-end' }}>
-        <div className="search-bar" style={{ width: '360px' }}>
+        <div className="search-bar w-full sm:w-[360px]">
           <Search size={16} />
           <input
             type="text"

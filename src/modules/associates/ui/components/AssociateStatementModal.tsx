@@ -127,7 +127,7 @@ export const AssociateStatementModal: React.FC<AssociateStatementModalProps> = (
   return createPortal(
     <div
       onClick={onClose}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs animate-in fade-in duration-150"
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-950/60 backdrop-blur-xs animate-in fade-in duration-150"
     >
       {/* Modal de Impresión de Recibo Individual */}
       <AssociateVoucherPrintModal
@@ -138,10 +138,10 @@ export const AssociateStatementModal: React.FC<AssociateStatementModalProps> = (
 
       <div
         onClick={(e) => e.stopPropagation()}
-        className="relative w-full max-w-3xl bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[92vh]"
+        className="relative w-full pb-[env(safe-area-inset-bottom)] sm:pb-0 max-w-3xl bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[92dvh] sm:max-h-[92dvh]"
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 bg-white">
+        <div className="flex items-center justify-between flex-wrap gap-3 px-4 sm:px-6 py-4 border-b border-slate-200 bg-white">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-indigo-50 text-indigo-700 rounded-xl border border-indigo-200">
               <Receipt size={20} />
@@ -170,7 +170,7 @@ export const AssociateStatementModal: React.FC<AssociateStatementModalProps> = (
         </div>
 
         {/* Content */}
-        <div className="p-6 overflow-y-auto space-y-6">
+        <div className="p-4 sm:p-6 overflow-y-auto space-y-6">
           {loading ? (
             <div className="py-12 text-center text-slate-400 text-xs">Cargando estado de cuenta y recibos...</div>
           ) : !statement ? (
@@ -302,8 +302,8 @@ export const AssociateStatementModal: React.FC<AssociateStatementModalProps> = (
                   </div>
                 </div>
 
-                <div className="rounded-xl border border-slate-200 overflow-hidden">
-                  <table className="w-full text-xs">
+                <div className="rounded-xl border border-slate-200 overflow-x-auto overscroll-x-contain">
+                  <table className="w-full min-w-[640px] text-xs">
                     <thead>
                       <tr className="bg-slate-50 text-slate-600 border-b border-slate-200">
                         <th className="py-2.5 px-3 text-left font-semibold">N° Recibo</th>
@@ -366,7 +366,7 @@ export const AssociateStatementModal: React.FC<AssociateStatementModalProps> = (
         </div>
 
         {/* Modal Footer with Exports */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-6 py-4 border-t border-slate-200 bg-slate-50/80">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-4 sm:px-6 py-4 border-t border-slate-200 bg-slate-50/80">
           <div className="flex items-center gap-2 w-full sm:w-auto">
             <button
               onClick={() => handleExport('pdf')}

@@ -2301,6 +2301,56 @@ textarea {
   }
 }
 
+/* Pestañas legacy: se desplazan horizontalmente en vez de desbordar la página */
+.tab-pills {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.tab-pills::-webkit-scrollbar {
+  display: none;
+}
+.tab-pill {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.search-bar {
+  max-width: 100%;
+}
+
+/* Componentes legacy (Documento Equivalente, Reportes Financieros) en celular */
+@media (max-width: 639px) {
+  .module-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+  .module-title {
+    font-size: 1.3rem;
+  }
+  .card {
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  .card-header,
+  .calc-row,
+  .asiento-row {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .form-group-row,
+  .receipt-meta-grid {
+    grid-template-columns: 1fr;
+  }
+  .tab-pill {
+    padding: 8px 12px;
+    font-size: 0.8rem;
+  }
+}
+
 /* ==========================================================================
    DOCUMENTOS IMPRIMIBLES (Plan de pagos, comprobantes, reportes)
    Solo se imprime el documento activo; nunca la interfaz completa.

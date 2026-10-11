@@ -368,7 +368,7 @@ export const QuotaTemplateConfigView: React.FC<QuotaTemplateConfigViewProps> = (
     <div className="space-y-6">
       {/* Toast alert */}
       {showSavedToast && (
-        <div className="p-3.5 bg-slate-100 border border-slate-300 rounded-xl flex items-center justify-between text-xs text-slate-800 shadow-2xs animate-in fade-in slide-in-from-top-2 duration-200">
+        <div className="p-3.5 bg-slate-100 border border-slate-300 rounded-xl flex items-start sm:items-center justify-between gap-3 text-xs text-slate-800 shadow-2xs animate-in fade-in slide-in-from-top-2 duration-200">
           <div className="flex items-center gap-2.5">
             <CheckCircle2 size={16} className="text-slate-700 shrink-0" />
             <span className="font-semibold">
@@ -674,15 +674,15 @@ export const QuotaTemplateConfigView: React.FC<QuotaTemplateConfigViewProps> = (
       {editingItemIndex !== null &&
         createPortal(
           <div
-            className="fixed inset-0 z-[10000] flex items-center justify-center bg-slate-950/60 backdrop-blur-sm p-4 animate-in fade-in duration-150"
+            className="fixed inset-0 z-[10000] flex items-end sm:items-center justify-center bg-slate-950/60 backdrop-blur-sm p-0 sm:p-4 animate-in fade-in duration-150"
             onClick={() => setEditingItemIndex(null)}
           >
             <div
-              className="bg-white rounded-2xl border border-slate-200 shadow-2xl max-w-2xl w-full max-h-[80vh] flex flex-col overflow-hidden animate-in zoom-in-95 duration-150"
+              className="bg-white rounded-t-2xl sm:rounded-2xl border border-slate-200 shadow-2xl max-w-2xl w-full pb-[env(safe-area-inset-bottom)] sm:pb-0 max-h-[92dvh] sm:max-h-[80dvh] flex flex-col overflow-hidden animate-in zoom-in-95 duration-150"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Header */}
-              <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 bg-white">
+              <div className="flex items-center justify-between flex-wrap gap-3 px-4 sm:px-6 py-4 border-b border-slate-200 bg-white">
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-slate-100 text-slate-700 rounded-lg border border-slate-200">
                     <Sparkles size={20} />
@@ -806,7 +806,7 @@ export const QuotaTemplateConfigView: React.FC<QuotaTemplateConfigViewProps> = (
               </div>
 
               {/* Footer */}
-              <div className="px-6 py-3 border-t border-slate-200 bg-slate-50/90 flex items-center justify-between">
+              <div className="px-4 sm:px-6 py-3 border-t border-slate-200 bg-slate-50/90 flex items-center justify-between flex-wrap gap-3">
                 <span className="text-xs text-slate-500">
                   Mostrando <strong>{filteredAccounts.length}</strong> cuentas disponibles
                 </span>
@@ -828,15 +828,15 @@ export const QuotaTemplateConfigView: React.FC<QuotaTemplateConfigViewProps> = (
   if (isModal) {
     return createPortal(
       <div
-        className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-in fade-in duration-200"
+        className="fixed inset-0 z-[9999] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-950/60 backdrop-blur-sm animate-in fade-in duration-200"
         onClick={onClose}
       >
         <div
-          className="relative w-full max-w-5xl max-h-[92vh] bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col animate-in zoom-in-95 duration-150"
+          className="relative w-full pb-[env(safe-area-inset-bottom)] sm:pb-0 max-w-5xl max-h-[92dvh] sm:max-h-[92dvh] bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col animate-in zoom-in-95 duration-150"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 bg-white shrink-0">
+          <div className="flex items-center justify-between flex-wrap gap-3 px-4 sm:px-6 py-4 border-b border-slate-200 bg-white shrink-0">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-slate-100 text-slate-700 rounded-lg border border-slate-200">
                 <Settings size={20} />
@@ -880,12 +880,12 @@ export const QuotaTemplateConfigView: React.FC<QuotaTemplateConfigViewProps> = (
           </div>
 
           {/* Body */}
-          <div className="p-6 overflow-y-auto space-y-6 flex-1">
+          <div className="p-4 sm:p-6 overflow-y-auto space-y-6 flex-1">
             {mainBody}
           </div>
 
           {/* Footer */}
-          <div className="flex items-center justify-between px-6 py-4 border-t border-slate-200 bg-slate-50/90 shrink-0">
+          <div className="flex items-center justify-between flex-wrap gap-3 px-4 sm:px-6 py-4 border-t border-slate-200 bg-slate-50/90 shrink-0">
             <div className="text-xs text-slate-500">
               Los cambios se aplicarán automáticamente a las cuotas de asociados.
             </div>

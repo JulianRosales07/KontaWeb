@@ -385,7 +385,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       </AnimatePresence>
 
         {/* Hero Section matching reference composition */}
-        <section className="relative z-20 max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-16 pt-8 lg:pt-14 pb-20 lg:pb-32 min-h-[calc(100vh-100px)] flex items-center">
+        <section className="relative z-20 max-w-[1440px] mx-auto px-4 min-[400px]:px-6 sm:px-10 lg:px-16 pt-8 lg:pt-14 pb-16 sm:pb-20 lg:pb-32 lg:min-h-[calc(100svh-100px)] flex items-center">
           <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center">
             {/* Left Column: Typography & Action */}
             <motion.div
@@ -468,7 +468,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 initial={{ opacity: 0, scale: 0.94, rotate: -12 }}
                 animate={{ opacity: 0.95, scale: 1, rotate: -12 }}
                 transition={{ duration: 0.55, ease: EASE_OUT }}
-                className="absolute w-[360px] h-[430px] sm:w-[420px] sm:h-[490px] lg:w-[460px] lg:h-[530px] bg-gradient-to-b from-[#e5f532] to-[#bbf426] rounded-3xl translate-x-6 -translate-y-2 shadow-2xl shadow-lime-300/30 pointer-events-none"
+                className="absolute w-[280px] h-[340px] min-[400px]:w-[360px] min-[400px]:h-[430px] sm:w-[420px] sm:h-[490px] lg:w-[460px] lg:h-[530px] bg-gradient-to-b from-[#e5f532] to-[#bbf426] rounded-3xl translate-x-6 -translate-y-2 shadow-2xl shadow-lime-300/30 pointer-events-none"
                 style={{
                   clipPath: 'polygon(30% 0%, 100% 70%, 10% 100%)',
                 }}

@@ -199,7 +199,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
         {/* Left Column (2 Cols): Personal Information Form */}
         <div className="lg:col-span-2 space-y-6">
           <form onSubmit={handleSave} className="rounded-3xl bg-white border border-slate-200/90 shadow-sm p-6 sm:p-7 space-y-5">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+            <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-100">
               <div className="flex items-center gap-2 text-slate-900 font-bold text-sm">
                 <User size={16} className="text-indigo-600" />
                 <span>Datos Personales y Cargo</span>
@@ -308,7 +308,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
 
           {/* Module Permissions Overview */}
           <div className="rounded-3xl bg-white border border-slate-200/90 shadow-sm p-6 sm:p-7 space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+            <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-100">
               <div className="flex items-center gap-2 text-slate-900 font-bold text-sm">
                 <Key size={16} className="text-indigo-600" />
                 <span>Permisos y Funcionalidades Habilitadas</span>

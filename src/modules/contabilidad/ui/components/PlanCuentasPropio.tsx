@@ -1045,7 +1045,7 @@ export const PlanCuentasPropio: React.FC = () => {
         </div>
 
         {/* Footer Stats */}
-        <div className="pt-4 mt-6 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
+        <div className="pt-4 mt-6 border-t border-slate-100 flex flex-col gap-1 sm:flex-row sm:items-center justify-between text-[11px] text-slate-500">
           <span>
             Mostrando <strong>{activeAccounts.length}</strong> cuentas activas en tu Plan Propio
           </span>
@@ -1061,15 +1061,15 @@ export const PlanCuentasPropio: React.FC = () => {
       {isCatalogModalOpen &&
         createPortal(
           <div
-            className="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-950/60 backdrop-blur-sm p-4 animate-in fade-in duration-150"
+            className="fixed inset-0 z-[9999] flex items-end sm:items-center justify-center bg-slate-950/60 backdrop-blur-sm p-0 sm:p-4 animate-in fade-in duration-150"
             onClick={() => setIsCatalogModalOpen(false)}
           >
             <div
-              className="bg-white rounded-2xl border border-slate-200 shadow-2xl max-w-3xl w-full max-h-[85vh] flex flex-col overflow-hidden animate-in zoom-in-95 duration-150"
+              className="bg-white rounded-t-2xl sm:rounded-2xl border border-slate-200 shadow-2xl max-w-3xl w-full pb-[env(safe-area-inset-bottom)] sm:pb-0 max-h-[92dvh] sm:max-h-[85dvh] flex flex-col overflow-hidden animate-in zoom-in-95 duration-150"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Modal Header */}
-              <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 bg-white">
+              <div className="flex items-center justify-between flex-wrap gap-3 px-4 sm:px-6 py-4 border-b border-slate-200 bg-white">
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-slate-100 text-slate-700 rounded-lg border border-slate-200">
                     <Sparkles size={20} />
@@ -1237,7 +1237,7 @@ export const PlanCuentasPropio: React.FC = () => {
               </div>
 
               {/* Modal Footer */}
-              <div className="px-6 py-4 border-t border-slate-200 bg-slate-50/90 flex items-center justify-between">
+              <div className="px-4 sm:px-6 py-4 border-t border-slate-200 bg-slate-50/90 flex items-center justify-between flex-wrap gap-3">
                 <span className="text-xs text-slate-500">
                   Seleccionadas <strong className="text-slate-800 font-semibold">{activeAccounts.length}</strong> de <strong className="text-slate-800 font-semibold">{accounts.length}</strong> cuentas disponibles
                 </span>
@@ -1261,15 +1261,15 @@ export const PlanCuentasPropio: React.FC = () => {
         targetParentAccount &&
         createPortal(
           <div
-            className="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-950/60 backdrop-blur-sm p-4 animate-in fade-in duration-150"
+            className="fixed inset-0 z-[9999] flex items-end sm:items-center justify-center bg-slate-950/60 backdrop-blur-sm p-0 sm:p-4 animate-in fade-in duration-150"
             onClick={() => setIsCustomSubaccountModalOpen(false)}
           >
             <div
-              className="relative w-full max-w-lg bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden flex flex-col animate-in zoom-in-95 duration-150"
+              className="relative w-full pb-[env(safe-area-inset-bottom)] sm:pb-0 max-w-lg bg-white rounded-t-2xl sm:rounded-2xl shadow-xl border border-slate-200 max-h-[92dvh] overflow-y-auto flex flex-col animate-in zoom-in-95 duration-150"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Modal Header */}
-              <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 bg-white">
+              <div className="flex items-center justify-between flex-wrap gap-3 px-4 sm:px-6 py-4 border-b border-slate-200 bg-white">
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-indigo-50 text-indigo-600 rounded-xl border border-indigo-100 flex items-center justify-center">
                     <Layers size={20} />
@@ -1299,9 +1299,9 @@ export const PlanCuentasPropio: React.FC = () => {
               </div>
 
               <form onSubmit={handleSaveCustomSubaccount}>
-                <div className="p-6 space-y-4">
+                <div className="p-4 sm:p-6 space-y-4">
                   {/* Cuenta Padre Info Card */}
-                  <div className="bg-slate-50 border border-slate-200/90 rounded-xl p-3.5 flex items-center justify-between">
+                  <div className="bg-slate-50 border border-slate-200/90 rounded-xl p-3.5 flex flex-wrap items-center justify-between gap-2">
                     <div>
                       <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-0.5">
                         Cuenta Padre (Mayor)
@@ -1376,7 +1376,7 @@ export const PlanCuentasPropio: React.FC = () => {
 
                   {/* Código Asignado - Carga Automática */}
                   <div>
-                    <div className="p-3 bg-indigo-50/60 border border-indigo-100 rounded-xl flex items-center justify-between">
+                    <div className="p-3 bg-indigo-50/60 border border-indigo-100 rounded-xl flex flex-wrap items-center justify-between gap-2">
                       <div>
                         <span className="text-[10px] font-bold text-indigo-700 uppercase tracking-wider block">
                           Código Asignado por el Selector
@@ -1461,7 +1461,7 @@ export const PlanCuentasPropio: React.FC = () => {
                 </div>
 
                 {/* Modal Footer */}
-                <div className="flex items-center justify-end gap-2 px-6 py-4 border-t border-slate-200 bg-slate-50/90">
+                <div className="flex items-center justify-end gap-2 px-4 sm:px-6 py-4 border-t border-slate-200 bg-slate-50/90">
                   <button
                     type="button"
                     onClick={() => setIsCustomSubaccountModalOpen(false)}
@@ -1495,15 +1495,15 @@ export const PlanCuentasPropio: React.FC = () => {
         editingAccount &&
         createPortal(
           <div
-            className="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-950/60 backdrop-blur-sm p-4 animate-in fade-in duration-150"
+            className="fixed inset-0 z-[9999] flex items-end sm:items-center justify-center bg-slate-950/60 backdrop-blur-sm p-0 sm:p-4 animate-in fade-in duration-150"
             onClick={() => setIsEditModalOpen(false)}
           >
             <div
-              className="relative w-full max-w-md bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden flex flex-col animate-in zoom-in-95 duration-150"
+              className="relative w-full pb-[env(safe-area-inset-bottom)] sm:pb-0 max-w-md bg-white rounded-t-2xl sm:rounded-2xl shadow-xl border border-slate-200 max-h-[92dvh] overflow-y-auto flex flex-col animate-in zoom-in-95 duration-150"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Header */}
-              <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 bg-white">
+              <div className="flex items-center justify-between flex-wrap gap-3 px-4 sm:px-6 py-4 border-b border-slate-200 bg-white">
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-slate-100 text-slate-700 rounded-lg border border-slate-200">
                     <Edit2 size={20} />
@@ -1533,7 +1533,7 @@ export const PlanCuentasPropio: React.FC = () => {
               </div>
 
               <form onSubmit={handleSaveEditAccount}>
-                <div className="p-6 space-y-4">
+                <div className="p-4 sm:p-6 space-y-4">
                   <div className="bg-slate-50/70 border border-slate-200 rounded-xl p-3.5">
                     <label className="block text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1">
                       Código PUC
@@ -1557,7 +1557,7 @@ export const PlanCuentasPropio: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="flex items-center justify-end gap-2 px-6 py-4 border-t border-slate-200 bg-slate-50/90">
+                <div className="flex items-center justify-end gap-2 px-4 sm:px-6 py-4 border-t border-slate-200 bg-slate-50/90">
                   <button
                     type="button"
                     onClick={() => setIsEditModalOpen(false)}
@@ -1584,15 +1584,15 @@ export const PlanCuentasPropio: React.FC = () => {
       {isShareModalOpen &&
         createPortal(
           <div
-            className="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-950/60 backdrop-blur-sm p-4 animate-in fade-in duration-150"
+            className="fixed inset-0 z-[9999] flex items-end sm:items-center justify-center bg-slate-950/60 backdrop-blur-sm p-0 sm:p-4 animate-in fade-in duration-150"
             onClick={() => setIsShareModalOpen(false)}
           >
             <div
-              className="relative w-full max-w-md bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden flex flex-col animate-in zoom-in-95 duration-150"
+              className="relative w-full pb-[env(safe-area-inset-bottom)] sm:pb-0 max-w-md bg-white rounded-t-2xl sm:rounded-2xl shadow-xl border border-slate-200 max-h-[92dvh] overflow-y-auto flex flex-col animate-in zoom-in-95 duration-150"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Header */}
-              <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 bg-white">
+              <div className="flex items-center justify-between flex-wrap gap-3 px-4 sm:px-6 py-4 border-b border-slate-200 bg-white">
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-slate-100 text-slate-700 rounded-lg border border-slate-200">
                     <Share2 size={20} />
@@ -1621,7 +1621,7 @@ export const PlanCuentasPropio: React.FC = () => {
                 </button>
               </div>
 
-              <div className="p-6 space-y-3">
+              <div className="p-4 sm:p-6 space-y-3">
                 <button
                   type="button"
                   onClick={() => {
@@ -1677,7 +1677,7 @@ export const PlanCuentasPropio: React.FC = () => {
                 </button>
               </div>
 
-              <div className="flex items-center justify-end px-6 py-4 border-t border-slate-200 bg-slate-50/90">
+              <div className="flex items-center justify-end px-4 sm:px-6 py-4 border-t border-slate-200 bg-slate-50/90">
                 <button
                   type="button"
                   onClick={() => setIsShareModalOpen(false)}
@@ -1697,15 +1697,15 @@ export const PlanCuentasPropio: React.FC = () => {
       {isImportModalOpen &&
         createPortal(
           <div
-            className="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-950/60 backdrop-blur-sm p-4 animate-in fade-in duration-150"
+            className="fixed inset-0 z-[9999] flex items-end sm:items-center justify-center bg-slate-950/60 backdrop-blur-sm p-0 sm:p-4 animate-in fade-in duration-150"
             onClick={() => setIsImportModalOpen(false)}
           >
             <div
-              className="relative w-full max-w-lg bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden flex flex-col animate-in zoom-in-95 duration-150"
+              className="relative w-full pb-[env(safe-area-inset-bottom)] sm:pb-0 max-w-lg bg-white rounded-t-2xl sm:rounded-2xl shadow-xl border border-slate-200 max-h-[92dvh] overflow-y-auto flex flex-col animate-in zoom-in-95 duration-150"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Header */}
-              <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 bg-white">
+              <div className="flex items-center justify-between flex-wrap gap-3 px-4 sm:px-6 py-4 border-b border-slate-200 bg-white">
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-slate-100 text-slate-700 rounded-lg border border-slate-200">
                     <Upload size={20} />
@@ -1734,7 +1734,7 @@ export const PlanCuentasPropio: React.FC = () => {
                 </button>
               </div>
 
-              <div className="p-6 space-y-4">
+              <div className="p-4 sm:p-6 space-y-4">
                 <div className="p-4 bg-slate-50/70 border border-slate-200 rounded-xl space-y-1.5">
                   <div className="flex items-center gap-2 text-xs font-bold text-slate-800">
                     <Info size={14} className="text-slate-600" />
@@ -1780,7 +1780,7 @@ export const PlanCuentasPropio: React.FC = () => {
                 </div>
               </div>
 
-              <div className="flex items-center justify-end px-6 py-4 border-t border-slate-200 bg-slate-50/90">
+              <div className="flex items-center justify-end px-4 sm:px-6 py-4 border-t border-slate-200 bg-slate-50/90">
                 <button
                   type="button"
                   onClick={() => setIsImportModalOpen(false)}

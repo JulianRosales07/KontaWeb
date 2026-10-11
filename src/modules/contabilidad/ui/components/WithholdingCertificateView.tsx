@@ -166,13 +166,13 @@ export const WithholdingCertificateView: React.FC = () => {
 
       {statusMessage && (
         <div
-          className={`p-4 rounded-2xl border flex items-center justify-between shadow-xs ${
+          className={`p-4 rounded-2xl border flex items-start sm:items-center justify-between gap-3 shadow-xs ${
             statusMessage.type === 'success'
               ? 'bg-emerald-50 border-emerald-200 text-emerald-900'
               : 'bg-rose-50 border-rose-200 text-rose-900'
           }`}
         >
-          <div className="flex items-center gap-2.5 text-xs">
+          <div className="flex min-w-0 items-center gap-2.5 text-xs">
             {statusMessage.type === 'success' ? (
               <CheckCircle2 size={16} className="text-emerald-600 shrink-0" />
             ) : (
@@ -193,7 +193,7 @@ export const WithholdingCertificateView: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left Column: Third Party Selector */}
         <div className="lg:col-span-5 bg-white rounded-3xl p-5 border border-slate-200 shadow-xs space-y-4">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-wrap items-center justify-between gap-2">
             <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
               1. Selecciona el Tercero / Sujeto Pasivo
             </h3>
@@ -250,7 +250,7 @@ export const WithholdingCertificateView: React.FC = () => {
         {/* Right Column: Certificate Format & Action */}
         <div className="lg:col-span-7 bg-white rounded-3xl p-6 border border-slate-200 shadow-xs space-y-6 flex flex-col justify-between">
           <div className="space-y-6">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+            <div className="flex items-center justify-between gap-3 border-b border-slate-100 pb-4">
               <div>
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                   Vista Previa del Certificado
@@ -283,8 +283,8 @@ export const WithholdingCertificateView: React.FC = () => {
             )}
 
             {/* Concept Coverage Table */}
-            <div className="rounded-2xl border border-slate-200 overflow-hidden text-xs">
-              <table className="w-full text-left">
+            <div className="rounded-2xl border border-slate-200 overflow-x-auto overscroll-x-contain text-xs">
+              <table className="w-full min-w-[560px] text-left">
                 <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 font-semibold">
                   <tr>
                     <th className="py-2.5 px-3">Cuenta PUC</th>
@@ -325,14 +325,14 @@ export const WithholdingCertificateView: React.FC = () => {
           </div>
 
           {/* Action Download Button */}
-          <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
+          <div className="pt-4 border-t border-slate-100 flex flex-col gap-3 sm:flex-row sm:items-center justify-between">
             <span className="text-xs text-slate-400">
               Formato Oficial PDF OpenPDF (Sin dependencias externas)
             </span>
             <button
               onClick={handleDownload}
               disabled={downloading || !selectedParty}
-              className="flex items-center gap-2 px-6 py-3 bg-[#5850ec] hover:bg-[#4a42d4] text-white text-xs font-bold rounded-xl shadow-md shadow-indigo-500/20 transition-all cursor-pointer disabled:opacity-50"
+              className="flex w-full sm:w-auto justify-center items-center gap-2 px-6 py-3 bg-[#5850ec] hover:bg-[#4a42d4] text-white text-xs font-bold rounded-xl shadow-md shadow-indigo-500/20 transition-all cursor-pointer disabled:opacity-50"
             >
               {downloading ? (
                 <>
