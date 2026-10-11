@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://kontaweb.vercel.app/sitemap.xml
