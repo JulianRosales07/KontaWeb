@@ -11,6 +11,7 @@ import { Alert, PageContainer, PageHeader, StatCard, buttonClass } from '../../.
 import { FormField, MoneyInput, inputClass, selectClass } from '../../../shared/ui/components/MoneyInput';
 import { Modal } from '../../../shared/ui/components/Modal';
 import { StatusBadge } from '../../../shared/ui/components/StatusBadge';
+import { TablePagination, TableSearchInput, usePagedRows, useTableSearch } from '../../../shared/ui/components/TablePagination';
 
 type Tab = 'multas' | 'registrar' | 'tipos';
 
@@ -134,10 +135,15 @@ const FinesList: React.FC<{ types: FineType[]; associates: AssociateSummary[]; c
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status, partyId, typeId, from, to]);
 
-  const pending = fines.filter((f) => f.status === 'PENDING');
+  const search = useTableSearch(fines, (f) =>
+    [f.thirdPartyName, f.thirdPartyDocument, f.fineTypeName, f.description, f.voidReason, f.receiptNumber, FINE_STATUS_LABELS[f.status]].join(' '),
+  );
+  const visible = search.filtered;
+  const paged = usePagedRows(visible, 25);
+  const pending = visible.filter((f) => f.status === 'PENDING');
   const selectedFines = fines.filter((f) => selected.includes(f.id));
   const selectedTotal = selectedFines.reduce((s, f) => s + f.amount, 0);
-  const listTotal = fines.reduce((s, f) => s + f.amount, 0);
+  const listTotal = visible.reduce((s, f) => s + f.amount, 0);
   const allPendingSelected = pending.length > 0 && pending.every((f) => selected.includes(f.id));
 
   const openVoucher = async (id: string) => {
@@ -185,6 +191,20 @@ const FinesList: React.FC<{ types: FineType[]; associates: AssociateSummary[]; c
 
       {error && <Alert tone="error" onClose={() => setError(null)}>{error}</Alert>}
 
+      <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:justify-between">
+        <TableSearchInput
+          value={search.query}
+          onChange={search.setQuery}
+          placeholder="Buscar por asociado, documento, multa, detalle o recibo…"
+          className="w-full sm:max-w-md sm:flex-1"
+        />
+        {search.query && (
+          <p className="text-xs text-slate-500">
+            <strong className="font-semibold text-slate-800">{visible.length}</strong> de {fines.length} multas coinciden
+          </p>
+        )}
+      </div>
+
       {canManage && pending.length > 0 && (
         <div className="flex flex-col gap-2 rounded-xl border border-indigo-100 bg-indigo-50/60 p-3 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-sm text-indigo-900">
@@ -226,10 +246,14 @@ const FinesList: React.FC<{ types: FineType[]; associates: AssociateSummary[]; c
           <tbody>
             {loading ? (
               <tr><td colSpan={9} className="px-4 py-10 text-center text-slate-500">Cargando multas…</td></tr>
-            ) : fines.length === 0 ? (
-              <tr><td colSpan={9} className="px-4 py-10 text-center text-slate-500">No hay multas para los filtros seleccionados.</td></tr>
+            ) : visible.length === 0 ? (
+              <tr>
+                <td colSpan={9} className="px-4 py-10 text-center text-slate-500">
+                  {search.query ? `Ninguna multa coincide con «${search.query}».` : 'No hay multas para los filtros seleccionados.'}
+                </td>
+              </tr>
             ) : (
-              fines.map((f) => (
+              paged.pageRows.map((f) => (
                 <tr key={f.id} className={`border-b border-slate-100 ${selected.includes(f.id) ? 'bg-indigo-50/50' : 'hover:bg-slate-50'}`}>
                   {canManage && (
                     <td className="px-3 py-2">
@@ -276,10 +300,10 @@ const FinesList: React.FC<{ types: FineType[]; associates: AssociateSummary[]; c
               ))
             )}
           </tbody>
-          {fines.length > 0 && (
+          {visible.length > 0 && (
             <tfoot>
               <tr className="bg-slate-900 font-bold text-white">
-                <td colSpan={canManage ? 7 : 6} className="px-3 py-2.5 text-xs uppercase">Total ({fines.length})</td>
+                <td colSpan={canManage ? 7 : 6} className="px-3 py-2.5 text-xs uppercase">Total ({visible.length})</td>
                 <td className="whitespace-nowrap px-3 py-2.5 text-right tabular-nums">{formatCOP(listTotal)}</td>
                 {canManage && <td />}
               </tr>
@@ -287,6 +311,7 @@ const FinesList: React.FC<{ types: FineType[]; associates: AssociateSummary[]; c
           )}
         </table>
       </div>
+      {!loading && <TablePagination {...paged} itemLabel="multas" />}
 
       <PayFinesModal
         open={paying}

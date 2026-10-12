@@ -164,6 +164,7 @@ export const JournalVouchersView: React.FC = () => {
       <ResponsiveTable
         columns={columns}
         rows={vouchers}
+        pageSize={0}
         rowKey={(v) => v.id}
         loading={loading}
         minWidth={1050}

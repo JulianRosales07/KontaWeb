@@ -2,6 +2,7 @@ import React from 'react';
 import { Table } from '@/components/ui/heroui-table';
 import { EmptyState } from '@heroui/react';
 import { Inbox, Loader2 } from 'lucide-react';
+import { TablePagination, usePagedRows } from './TablePagination';
 
 export interface TableColumn<T> {
   key: string;
@@ -33,6 +34,8 @@ export interface ResponsiveTableProps<T> {
   rowClassName?: (row: T) => string;
   dense?: boolean;
   minWidth?: number;
+  /** Filas por página (paginación en el cliente). 0 la desactiva, p. ej. si el servidor ya pagina. */
+  pageSize?: number;
 }
 
 const alignClass = (a?: 'left' | 'right' | 'center') =>
@@ -58,8 +61,12 @@ export function ResponsiveTable<T>({
   rowClassName,
   dense,
   minWidth = 720,
+  pageSize = 25,
 }: ResponsiveTableProps<T>) {
   const cell = dense ? 'px-3 py-2' : 'px-4 py-3';
+  const paged = usePagedRows(rows, pageSize);
+  const pageRows = paged.pageRows;
+  const pagination = !loading && <TablePagination {...paged} />;
 
   const table = (
     <Table className="w-full min-h-[200px] overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xs">
@@ -99,7 +106,7 @@ export function ResponsiveTable<T>({
               </EmptyState>
             )}
           >
-            {loading ? [] : rows.map((row, i) => (
+            {loading ? [] : pageRows.map((row, i) => (
               <Table.Row
                 key={rowKey(row, i)}
                 id={rowKey(row, i)}
@@ -127,10 +134,16 @@ export function ResponsiveTable<T>({
     </Table>
   );
 
-  if (mobileMode === 'scroll') return table;
+  if (mobileMode === 'scroll')
+    return (
+      <div className="flex min-w-0 flex-col gap-3">
+        {table}
+        {pagination}
+      </div>
+    );
 
   return (
-    <>
+    <div className="flex min-w-0 flex-col gap-3">
       <div className="hidden md:block">{table}</div>
       <div className="md:hidden">
         {loading ? (
@@ -147,7 +160,7 @@ export function ResponsiveTable<T>({
           </div>
         ) : (
           <ul className="flex flex-col gap-3">
-            {rows.map((row, i) => (
+            {pageRows.map((row, i) => (
               <li
                 key={rowKey(row, i)}
                 className={`rounded-xl border border-slate-200 bg-white p-4 shadow-xs ${onRowClick ? 'cursor-pointer active:bg-slate-50' : ''} ${rowClassName?.(row) ?? ''}`}
@@ -183,6 +196,7 @@ export function ResponsiveTable<T>({
           </div>
         )}
       </div>
-    </>
+      {pagination}
+    </div>
   );
 }

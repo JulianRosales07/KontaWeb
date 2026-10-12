@@ -14,6 +14,7 @@ import { ReportsDashboard } from '../components/ReportsDashboard';
 import { MonthlyReportImporter } from '../components/MonthlyReportImporter';
 import { InvestmentsManager } from '../components/InvestmentsManager';
 import { ReportsMenu } from '../components/ReportsMenu';
+import { TablePagination, TableSearchInput, usePagedRows, useTableSearch } from '../../../../shared/ui/components/TablePagination';
 
 type FilterKey = 'account' | 'voucherType' | 'party' | 'partyRequired' | 'method' | 'level' | 'byParty' | 'cutOnly';
 
@@ -577,8 +578,24 @@ const ScreenReportTable: React.FC<{
   const minWidth = cols.reduce((sum, c) => sum + columnWidth(c, dense), 0);
   const cellPad = dense ? 'px-2.5 py-1.5' : 'px-3 py-2';
 
+  const search = useTableSearch(report.rows, (r) =>
+    cols
+      .map((c) => {
+        const raw = r.cells[c.key];
+        const shown = formatCell(c, raw);
+        return `${raw ?? ''} ${typeof shown === 'string' ? shown : ''}`;
+      })
+      .join(' '),
+  );
+  const paged = usePagedRows(search.filtered, 50);
+  const { setQuery } = search;
+  useEffect(() => setQuery(''), [report, setQuery]);
+
   const scrollRef = useRef<HTMLDivElement>(null);
   const [edges, setEdges] = useState({ left: false, right: false });
+  useEffect(() => {
+    if (scrollRef.current) scrollRef.current.scrollTop = 0;
+  }, [paged.page, paged.pageSize]);
 
   useEffect(() => {
     const el = scrollRef.current;
@@ -593,7 +610,7 @@ const ScreenReportTable: React.FC<{
       el.removeEventListener('scroll', update);
       ro?.disconnect();
     };
-  }, [report]);
+  }, [report, paged.page, paged.pageSize, search.query]);
 
   const scrollBy = (dir: 1 | -1) => {
     const el = scrollRef.current;
@@ -614,12 +631,14 @@ const ScreenReportTable: React.FC<{
 
   return (
     <div className="flex min-w-0 flex-col gap-2">
-      <div className="hidden flex-wrap items-center justify-between gap-2 md:flex">
-        <p className="text-xs text-slate-500">
-          {cols.length} columnas · {report.rows.length} filas
-          {overflowing && <span className="ml-1 font-medium text-indigo-600">· Desliza horizontalmente para ver todas las columnas</span>}
-        </p>
-        <div className="flex items-center gap-1.5">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <TableSearchInput
+          value={search.query}
+          onChange={search.setQuery}
+          placeholder="Buscar en el reporte (cuenta, tercero, concepto, comprobante…)"
+          className="w-full sm:max-w-md sm:flex-1"
+        />
+        <div className="hidden items-center gap-1.5 md:flex">
           {overflowing && (
             <>
               <button type="button" onClick={() => scrollBy(-1)} disabled={!edges.left} className={arrowClass} aria-label="Ver columnas anteriores">
@@ -643,6 +662,18 @@ const ScreenReportTable: React.FC<{
           )}
         </div>
       </div>
+      <p className="text-xs text-slate-500">
+        {search.query ? (
+          <>
+            <strong className="font-semibold text-slate-800">{search.filtered.length}</strong> de {report.rows.length} filas coinciden con «{search.query}»
+          </>
+        ) : (
+          <>
+            {cols.length} columnas · {report.rows.length} filas
+          </>
+        )}
+        {overflowing && <span className="ml-1 hidden font-medium text-indigo-600 md:inline">· Desliza horizontalmente para ver todas las columnas</span>}
+      </p>
 
       <div className="relative min-w-0">
         <div ref={scrollRef} className="table-scroll max-h-[min(70dvh,820px)] overflow-y-auto rounded-lg border border-slate-200">
@@ -663,14 +694,14 @@ const ScreenReportTable: React.FC<{
               </tr>
             </thead>
             <tbody>
-              {report.rows.length === 0 ? (
+              {paged.pageRows.length === 0 ? (
                 <tr>
                   <td colSpan={cols.length} className="px-4 py-10 text-center text-sm text-slate-500">
-                    Sin movimientos para los filtros seleccionados.
+                    {search.query ? `Ninguna fila coincide con «${search.query}».` : 'Sin movimientos para los filtros seleccionados.'}
                   </td>
                 </tr>
               ) : (
-                report.rows.map((r, i) => {
+                paged.pageRows.map((r, i) => {
                   const nav = !!onRowClick && isNavigable(r);
                   const level = Number(r.cells._level ?? 0);
                   const rowBorder = r.rowType === 'SUBTOTAL' ? 'border-b-2 border-slate-300' : 'border-b border-slate-100';
@@ -712,7 +743,7 @@ const ScreenReportTable: React.FC<{
                 })
               )}
             </tbody>
-            {Object.keys(report.totals).length > 0 && report.rows.length > 0 && (
+            {Object.keys(report.totals).length > 0 && paged.pageRows.length > 0 && (
               <tfoot className="md:sticky md:bottom-0 md:z-20">
                 <tr className="bg-slate-900 font-bold text-white">
                   {cols.map((c, i) => (
@@ -722,7 +753,13 @@ const ScreenReportTable: React.FC<{
                         i === 0 ? 'md:sticky md:left-0 md:z-10 md:shadow-[1px_0_0_#475569]' : ''
                       }`}
                     >
-                      {i === 0 ? 'TOTALES' : report.totals[c.key] !== undefined ? formatCell(c, report.totals[c.key]) : ''}
+                      {i === 0
+                        ? search.query || paged.pageCount > 1
+                          ? 'TOTALES DEL REPORTE'
+                          : 'TOTALES'
+                        : report.totals[c.key] !== undefined
+                          ? formatCell(c, report.totals[c.key])
+                          : ''}
                     </td>
                   ))}
                 </tr>
@@ -744,6 +781,7 @@ const ScreenReportTable: React.FC<{
           }`}
         />
       </div>
+      <TablePagination {...paged} pageSizeOptions={[25, 50, 100, 200]} itemLabel="filas" />
     </div>
   );
 };

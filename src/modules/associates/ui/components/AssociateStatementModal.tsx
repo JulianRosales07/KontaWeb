@@ -20,6 +20,7 @@ import type { AssociateStatement, AssociateReceipt } from '../../types/associate
 import { associateApi } from '../../infrastructure/associateApi';
 import { documentExportService } from '../../../../services/documentExportService';
 import { AssociateVoucherPrintModal } from './AssociateVoucherPrintModal';
+import { TablePagination, usePagedRows } from '../../../../shared/ui/components/TablePagination';
 
 interface AssociateStatementModalProps {
   isOpen: boolean;
@@ -64,8 +65,6 @@ export const AssociateStatementModal: React.FC<AssociateStatementModalProps> = (
     }
   }, [isOpen, thirdPartyId]);
 
-  if (!isOpen) return null;
-
   const filteredHistory = (statement?.receiptsHistory || []).filter((rc) => {
     if (!historySearch.trim()) return true;
     const q = historySearch.toLowerCase();
@@ -76,6 +75,7 @@ export const AssociateStatementModal: React.FC<AssociateStatementModalProps> = (
       (rc.notes && rc.notes.toLowerCase().includes(q))
     );
   });
+  const historyPaged = usePagedRows(filteredHistory, 10);
 
   // Cálculo detallado de Ahorros del Socio: Aportes Ordinarios (311505) + Aporte Extra (311510) + Turismo y Recreación (238035)
   const savingsBreakdown = useMemo(() => {
@@ -123,6 +123,9 @@ export const AssociateStatementModal: React.FC<AssociateStatementModalProps> = (
       otherSocial,
     };
   }, [statement]);
+
+  // Todos los hooks van antes de este retorno (React exige el mismo orden en cada render).
+  if (!isOpen) return null;
 
   return createPortal(
     <div
@@ -322,7 +325,7 @@ export const AssociateStatementModal: React.FC<AssociateStatementModalProps> = (
                           </td>
                         </tr>
                       ) : (
-                        filteredHistory.map((rc, idx) => (
+                        historyPaged.pageRows.map((rc, idx) => (
                           <tr key={rc.id || idx} className="hover:bg-slate-50/70 transition-colors">
                             <td className="py-2.5 px-3 font-mono font-bold text-slate-900">
                               {rc.receiptNumber}
@@ -360,6 +363,7 @@ export const AssociateStatementModal: React.FC<AssociateStatementModalProps> = (
                     </tbody>
                   </table>
                 </div>
+                <TablePagination {...historyPaged} pageSizeOptions={[10, 25, 50]} itemLabel="recibos" />
               </div>
             </>
           )}
