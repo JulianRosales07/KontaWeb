@@ -51,7 +51,7 @@ export const DEFAULT_AUDIO_TEMPLATE: QuotaTemplate = {
     {
       id: 'item-2',
       conceptName: 'Aporte Extraordinario (Ahorro Extra del Socio)',
-      category: 'EQUITY_SAVING',
+      category: 'SAVINGS',
       accountId: 'acc-311510',
       accountCode: '311510',
       accountName: 'Aporte extraordinario',

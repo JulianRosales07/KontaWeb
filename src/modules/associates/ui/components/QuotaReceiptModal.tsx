@@ -214,7 +214,8 @@ export const QuotaReceiptModal: React.FC<Props> = ({ open, onClose, onRegistered
       name.includes('extra') ||
       name.includes('turismo') ||
       name.includes('recreaci') ||
-      c.category === 'EQUITY_SAVING'
+      c.category === 'EQUITY_SAVING' ||
+      c.category === 'SAVINGS'
     );
   };
 
@@ -245,7 +246,7 @@ export const QuotaReceiptModal: React.FC<Props> = ({ open, onClose, onRegistered
           {
             key: `custom-${Date.now()}`,
             conceptName: 'Ahorro Voluntario / Extra',
-            category: 'EQUITY_SAVING',
+            category: 'SAVINGS',
             accountCode: '311510',
             accountName: 'Aportes extraordinarios',
             amount: amountToAdd,
@@ -270,7 +271,7 @@ export const QuotaReceiptModal: React.FC<Props> = ({ open, onClose, onRegistered
       {
         key: newKey,
         conceptName: 'Ahorro Voluntario / Extra',
-        category: 'EQUITY_SAVING',
+        category: 'SAVINGS',
         accountCode: '311510',
         accountName: 'Aportes extraordinarios',
         amount: null,
