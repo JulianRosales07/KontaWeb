@@ -5,6 +5,7 @@ import { CollectionsView } from '../../../loans/ui/CollectionsView';
 import { LoansView } from '../../../loans/ui/LoansView';
 import { ReceivablesView } from '../../../loans/ui/ReceivablesView';
 import { FinesView } from '../../../fines/ui/FinesView';
+import { CashIncomeView } from '../CashIncomeView';
 
 export type CarteraTab =
   | 'cuentas-por-cobrar'
@@ -12,6 +13,7 @@ export type CarteraTab =
   | 'prestamos-asociados'
   | 'cuentas-por-pagar'
   | 'multas'
+  | 'ingresos-caja'
   | 'configuracion';
 
 interface CarteraModulePageProps {
@@ -26,6 +28,7 @@ export const CarteraModulePage: React.FC<CarteraModulePageProps> = ({ initialTab
     {initialTab === 'cuentas-por-cobrar' && <ReceivablesView />}
     {initialTab === 'cuentas-por-pagar' && <PayablesView />}
     {initialTab === 'multas' && <FinesView />}
+    {initialTab === 'ingresos-caja' && <CashIncomeView />}
     {initialTab === 'configuracion' && (
       <div className="mx-auto w-full max-w-7xl min-w-0">
         <QuotaTemplateConfigView />

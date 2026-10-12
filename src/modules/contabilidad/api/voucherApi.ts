@@ -46,6 +46,26 @@ export const VOUCHER_TYPE_LABELS: Record<VoucherType, string> = {
   APERTURA: 'Comprobante de apertura',
 };
 
+export interface JournalEntryRequest {
+  accountId?: string;
+  accountCode: string;
+  thirdPartyId?: string;
+  thirdPartyIdentification?: string;
+  referenceNumber?: string;
+  description?: string;
+  debit: number;
+  credit: number;
+}
+
+export interface JournalVoucherRequest {
+  voucherNumber: string;
+  voucherType: VoucherType;
+  issueDate: string;
+  description: string;
+  status?: VoucherStatus;
+  entries: JournalEntryRequest[];
+}
+
 export const voucherApi = {
   list: (params: { startDate?: string; endDate?: string; type?: string; status?: string; q?: string; page?: number; size?: number }) =>
     httpClient
@@ -55,6 +75,9 @@ export const voucherApi = {
       .then((r) => r.data),
 
   get: (id: string) => httpClient.get<JournalVoucher>(`/vouchers/${id}`).then((r) => r.data),
+
+  create: (req: JournalVoucherRequest) =>
+    httpClient.post<JournalVoucher>('/vouchers', req).then((r) => r.data),
 
   reverse: (id: string, reason?: string) =>
     httpClient.post<JournalVoucher>(`/vouchers/${id}/reverse`, null, { params: reason ? { reason } : {} }).then((r) => r.data),

@@ -62,6 +62,7 @@ export const NAV_SECTIONS: NavSection[] = [
     tab: 'cartera',
     items: [
       { id: 'cartera-recaudos', label: 'Recaudos y Abonos', tab: 'cartera', subtab: 'recaudo-asociados', permissions: ['COLLECTIONS_VIEW'] },
+      { id: 'cartera-ingresos-caja', label: 'Ingresos a Caja (Eventos/Rifas)', tab: 'cartera', subtab: 'ingresos-caja', permissions: ['COLLECTIONS_VIEW'], badge: 'Eventos' },
       { id: 'cartera-prestamos', label: 'Préstamos y Plan de Pagos', tab: 'cartera', subtab: 'prestamos-asociados', permissions: ['LOANS_VIEW'] },
       { id: 'cartera-cxc', label: 'Cuentas por Cobrar', tab: 'cartera', subtab: 'cuentas-por-cobrar', permissions: ['RECEIVABLES_VIEW'] },
       { id: 'cartera-cxp', label: 'Cuentas por Pagar', tab: 'cartera', subtab: 'cuentas-por-pagar', permissions: ['PAYABLES_VIEW'], badge: 'Aportes' },
