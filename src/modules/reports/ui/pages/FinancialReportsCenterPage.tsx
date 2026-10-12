@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { ArrowLeft, BarChart3, FileDown, FileSpreadsheet, Landmark, Play, Printer } from 'lucide-react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { ArrowLeft, BarChart3, ChevronLeft, ChevronRight, FileDown, FileSpreadsheet, Landmark, Maximize2, Minimize2, Play, Printer } from 'lucide-react';
 import { reportApi, type FinancialReport, type ReportColumn, type ReportFilters, type ReportRow } from '../../api/reportApi';
 import { directoryApi, type AssociateSummary } from '../../../associates/infrastructure/directoryApi';
 import { voucherApi, type JournalVoucher } from '../../../contabilidad/api/voucherApi';
@@ -106,6 +106,23 @@ export const FinancialReportsCenterPage: React.FC = () => {
   const [history, setHistory] = useState<View[]>([]);
   const [associates, setAssociates] = useState<AssociateSummary[]>([]);
   const [report, setReport] = useState<FinancialReport | null>(null);
+  // Vista ampliada: oculta el menú lateral para dar todo el ancho a la tabla (se recuerda por navegador).
+  const [wide, setWide] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('konta.reports.wide') === '1';
+    } catch {
+      return false;
+    }
+  });
+  const toggleWide = () =>
+    setWide((w) => {
+      try {
+        localStorage.setItem('konta.reports.wide', w ? '0' : '1');
+      } catch {
+        /* sin almacenamiento: solo dura la sesión */
+      }
+      return !w;
+    });
   const [loading, setLoading] = useState(false);
   const [exporting, setExporting] = useState<'pdf' | 'xlsx' | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -224,7 +241,7 @@ export const FinancialReportsCenterPage: React.FC = () => {
   const cutOnly = def.filters.includes('cutOnly');
 
   return (
-    <PageContainer>
+    <PageContainer className={wide ? 'max-w-none!' : ''}>
       <PageHeader
         title="Reportes financieros"
         subtitle="Cifras calculadas en el servidor a partir de los comprobantes contabilizados."
@@ -250,8 +267,8 @@ export const FinancialReportsCenterPage: React.FC = () => {
         }
       />
 
-      <div className="grid min-w-0 grid-cols-1 gap-5 lg:grid-cols-[280px_minmax(0,1fr)] lg:items-start">
-        <div className="lg:hidden">
+      <div className={`grid min-w-0 grid-cols-1 gap-5 lg:items-start ${wide ? '' : 'lg:grid-cols-[280px_minmax(0,1fr)]'}`}>
+        <div className={wide ? 'lg:max-w-md' : 'lg:hidden'}>
           <FormField label="Reporte" htmlFor="report-select">
             <select id="report-select" className={selectClass} value={code} onChange={(e) => select(e.target.value)}>
               {groups.map((g) => (
@@ -266,7 +283,7 @@ export const FinancialReportsCenterPage: React.FC = () => {
             </select>
           </FormField>
         </div>
-        <ReportsMenu items={menu} current={code} onSelect={select} />
+        {!wide && <ReportsMenu items={menu} current={code} onSelect={select} />}
 
         <div className="flex min-w-0 flex-col gap-4">
           {history.length > 0 && (
@@ -389,7 +406,7 @@ export const FinancialReportsCenterPage: React.FC = () => {
             <Alert tone="info">Seleccione un asociado y genere el reporte.</Alert>
           )}
 
-          {isTabular && report && <ReportView report={report} onRowClick={onRowClick} />}
+          {isTabular && report && <ReportView report={report} onRowClick={onRowClick} wide={wide} onToggleWide={toggleWide} />}
 
           {isTabular && report && (
             <PrintDocumentLayout
@@ -430,7 +447,12 @@ export const FinancialReportsCenterPage: React.FC = () => {
   );
 };
 
-const ReportView: React.FC<{ report: FinancialReport; onRowClick: (r: ReportRow) => void }> = ({ report, onRowClick }) => (
+const ReportView: React.FC<{
+  report: FinancialReport;
+  onRowClick: (r: ReportRow) => void;
+  wide: boolean;
+  onToggleWide: () => void;
+}> = ({ report, onRowClick, wide, onToggleWide }) => (
   <section className="flex min-w-0 flex-col gap-4 rounded-xl border border-slate-200 bg-white p-4 sm:p-5">
     <div className="flex flex-col gap-2 border-b border-slate-200 pb-4 sm:flex-row sm:items-start sm:justify-between">
       <div className="min-w-0">
@@ -475,7 +497,7 @@ const ReportView: React.FC<{ report: FinancialReport; onRowClick: (r: ReportRow)
     {report.rows.some(isNavigable) && (
       <p className="text-xs text-slate-500">Haga clic en una fila para ver su comprobante, el detalle del asociado o los terceros de la cuenta.</p>
     )}
-    <ReportTable report={report} onRowClick={onRowClick} />
+    <ReportTable report={report} onRowClick={onRowClick} wide={wide} onToggleWide={onToggleWide} />
   </section>
 );
 
@@ -485,7 +507,13 @@ const indent = (r: ReportRow, firstTextKey: string, key: string) => {
   return key === firstTextKey && level > 1 ? { paddingLeft: `${0.75 + (level - 1) * 0.75}rem` } : undefined;
 };
 
-const ReportTable: React.FC<{ report: FinancialReport; printable?: boolean; onRowClick?: (r: ReportRow) => void }> = ({ report, printable, onRowClick }) => {
+const ReportTable: React.FC<{
+  report: FinancialReport;
+  printable?: boolean;
+  onRowClick?: (r: ReportRow) => void;
+  wide?: boolean;
+  onToggleWide?: () => void;
+}> = ({ report, printable, onRowClick, wide, onToggleWide }) => {
   const cols = report.columns;
   const firstTextKey = cols.find((c) => c.key === 'name')?.key ?? '';
   if (printable) {
@@ -524,75 +552,198 @@ const ReportTable: React.FC<{ report: FinancialReport; printable?: boolean; onRo
     );
   }
 
+  return <ScreenReportTable report={report} onRowClick={onRowClick} wide={!!wide} onToggleWide={onToggleWide} />;
+};
+
+/** Ancho mínimo de cada columna en escritorio; la suma define cuándo hace falta scroll horizontal. */
+const columnWidth = (c: ReportColumn, dense: boolean) =>
+  WIDE_KEYS.has(c.key) ? (dense ? 180 : 220) : c.type === 'DATE' ? 96 : isNumeric(c) ? 112 : dense ? 100 : 120;
+
+/**
+ * Tabla del reporte en pantalla.
+ * - Escritorio/tablet: alto limitado (la barra de scroll horizontal siempre queda a la vista), encabezado y
+ *   totales fijos, primera columna fija, sombras y botones cuando hay columnas fuera de vista.
+ * - Celular (<768px): cada fila es una tarjeta (`table-stack`).
+ */
+const ScreenReportTable: React.FC<{
+  report: FinancialReport;
+  onRowClick?: (r: ReportRow) => void;
+  wide: boolean;
+  onToggleWide?: () => void;
+}> = ({ report, onRowClick, wide, onToggleWide }) => {
+  const cols = report.columns;
+  const firstTextKey = cols.find((c) => c.key === 'name')?.key ?? '';
+  const dense = cols.length >= 8;
+  const minWidth = cols.reduce((sum, c) => sum + columnWidth(c, dense), 0);
+  const cellPad = dense ? 'px-2.5 py-1.5' : 'px-3 py-2';
+
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [edges, setEdges] = useState({ left: false, right: false });
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const update = () =>
+      setEdges({ left: el.scrollLeft > 4, right: el.scrollLeft + el.clientWidth < el.scrollWidth - 4 });
+    update();
+    el.addEventListener('scroll', update, { passive: true });
+    const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(update) : null;
+    ro?.observe(el);
+    return () => {
+      el.removeEventListener('scroll', update);
+      ro?.disconnect();
+    };
+  }, [report]);
+
+  const scrollBy = (dir: 1 | -1) => {
+    const el = scrollRef.current;
+    if (el) el.scrollBy({ left: dir * Math.max(240, el.clientWidth * 0.6), behavior: 'smooth' });
+  };
+  const overflowing = edges.left || edges.right;
+
+  /** Fondo opaco para la primera columna fija (si no, el contenido se ve por debajo al desplazar). */
+  const stickyBg = (r: ReportRow, nav: boolean) =>
+    r.rowType === 'GROUP'
+      ? 'bg-slate-100'
+      : r.rowType === 'SUBTOTAL'
+        ? 'bg-slate-50'
+        : `bg-white ${nav ? 'group-hover:bg-indigo-50' : 'group-hover:bg-slate-50'}`;
+
+  const arrowClass =
+    'flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 disabled:cursor-default disabled:opacity-40 cursor-pointer';
+
   return (
-    <div className="table-scroll rounded-lg border border-slate-200">
-      <table className="table-stack w-full border-collapse text-sm" style={{ minWidth: Math.max(640, cols.length * 120) }}>
-        <thead className="sticky top-0 bg-slate-800 text-white">
-          <tr>
-            {cols.map((c) => (
-              <th key={c.key} scope="col" className={`whitespace-nowrap px-3 py-2.5 text-[11px] font-bold uppercase tracking-wide ${isNumeric(c) ? 'text-right' : 'text-left'}`}>
-                {c.label}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {report.rows.length === 0 ? (
-            <tr>
-              <td colSpan={cols.length} className="px-4 py-10 text-center text-sm text-slate-500">
-                Sin movimientos para los filtros seleccionados.
-              </td>
-            </tr>
-          ) : (
-            report.rows.map((r, i) => {
-              const nav = !!onRowClick && isNavigable(r);
-              const level = Number(r.cells._level ?? 0);
-              return (
-                <tr
-                  key={i}
-                  onClick={nav ? () => onRowClick!(r) : undefined}
-                  tabIndex={nav ? 0 : undefined}
-                  onKeyDown={nav ? (e) => e.key === 'Enter' && onRowClick!(r) : undefined}
-                  className={`${
-                    r.rowType === 'GROUP'
-                      ? 'bg-slate-100 font-bold text-slate-900'
-                      : r.rowType === 'SUBTOTAL'
-                        ? 'border-b-2 border-slate-300 bg-slate-50 font-semibold text-slate-900'
-                        : `border-b border-slate-100 text-slate-700 hover:bg-slate-50 ${level === 2 ? 'font-semibold text-slate-900' : ''}`
-                  } ${nav ? 'cursor-pointer hover:bg-indigo-50/60' : ''}`}
-                >
-                  {cols.map((c) => (
+    <div className="flex min-w-0 flex-col gap-2">
+      <div className="hidden flex-wrap items-center justify-between gap-2 md:flex">
+        <p className="text-xs text-slate-500">
+          {cols.length} columnas · {report.rows.length} filas
+          {overflowing && <span className="ml-1 font-medium text-indigo-600">· Desliza horizontalmente para ver todas las columnas</span>}
+        </p>
+        <div className="flex items-center gap-1.5">
+          {overflowing && (
+            <>
+              <button type="button" onClick={() => scrollBy(-1)} disabled={!edges.left} className={arrowClass} aria-label="Ver columnas anteriores">
+                <ChevronLeft size={16} />
+              </button>
+              <button type="button" onClick={() => scrollBy(1)} disabled={!edges.right} className={arrowClass} aria-label="Ver más columnas">
+                <ChevronRight size={16} />
+              </button>
+            </>
+          )}
+          {onToggleWide && (
+            <button
+              type="button"
+              onClick={onToggleWide}
+              className={`${buttonClass.ghost} hidden lg:inline-flex`}
+              title={wide ? 'Mostrar el menú de reportes' : 'Ocultar el menú y usar todo el ancho'}
+            >
+              {wide ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
+              {wide ? 'Mostrar menú' : 'Ampliar tabla'}
+            </button>
+          )}
+        </div>
+      </div>
+
+      <div className="relative min-w-0">
+        <div ref={scrollRef} className="table-scroll max-h-[min(70dvh,820px)] overflow-y-auto rounded-lg border border-slate-200">
+          <table className={`table-stack w-full border-separate border-spacing-0 ${dense ? 'text-xs' : 'text-sm'}`} style={{ minWidth }}>
+            <thead className="sticky top-0 z-20 bg-slate-800 text-white">
+              <tr>
+                {cols.map((c, ci) => (
+                  <th
+                    key={c.key}
+                    scope="col"
+                    className={`${cellPad} whitespace-nowrap bg-slate-800 py-2.5 text-[11px] font-bold uppercase tracking-wide ${isNumeric(c) ? 'text-right' : 'text-left'} ${
+                      ci === 0 ? 'sticky left-0 z-30 shadow-[1px_0_0_#475569]' : ''
+                    }`}
+                  >
+                    {c.label}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {report.rows.length === 0 ? (
+                <tr>
+                  <td colSpan={cols.length} className="px-4 py-10 text-center text-sm text-slate-500">
+                    Sin movimientos para los filtros seleccionados.
+                  </td>
+                </tr>
+              ) : (
+                report.rows.map((r, i) => {
+                  const nav = !!onRowClick && isNavigable(r);
+                  const level = Number(r.cells._level ?? 0);
+                  const rowBorder = r.rowType === 'SUBTOTAL' ? 'border-b-2 border-slate-300' : 'border-b border-slate-100';
+                  return (
+                    <tr
+                      key={i}
+                      onClick={nav ? () => onRowClick!(r) : undefined}
+                      tabIndex={nav ? 0 : undefined}
+                      onKeyDown={nav ? (e) => e.key === 'Enter' && onRowClick!(r) : undefined}
+                      className={`group ${
+                        r.rowType === 'GROUP'
+                          ? 'bg-slate-100 font-bold text-slate-900'
+                          : r.rowType === 'SUBTOTAL'
+                            ? 'bg-slate-50 font-semibold text-slate-900'
+                            : `text-slate-700 hover:bg-slate-50 ${level === 2 ? 'font-semibold text-slate-900' : ''}`
+                      } ${nav ? 'cursor-pointer hover:bg-indigo-50/60' : ''}`}
+                    >
+                      {cols.map((c, ci) => (
+                        <td
+                          key={c.key}
+                          style={indent(r, firstTextKey, c.key)}
+                          className={`${cellPad} ${rowBorder} align-top ${
+                            isNumeric(c) || c.type === 'DATE' || NOWRAP_KEYS.has(c.key)
+                              ? `whitespace-nowrap ${isNumeric(c) ? 'text-right tabular-nums' : ''}`
+                              : WIDE_KEYS.has(c.key)
+                                ? dense
+                                  ? 'min-w-[180px]'
+                                  : 'min-w-[220px]'
+                                : ''
+                          } ${c.key === 'voucher' && r.cells._voucherId ? 'font-mono text-indigo-700 underline decoration-dotted' : ''} ${
+                            ci === 0 ? `md:sticky md:left-0 md:z-10 md:shadow-[1px_0_0_#e2e8f0] ${stickyBg(r, nav)}` : ''
+                          }`}
+                        >
+                          {formatCell(c, r.cells[c.key])}
+                        </td>
+                      ))}
+                    </tr>
+                  );
+                })
+              )}
+            </tbody>
+            {Object.keys(report.totals).length > 0 && report.rows.length > 0 && (
+              <tfoot className="md:sticky md:bottom-0 md:z-20">
+                <tr className="bg-slate-900 font-bold text-white">
+                  {cols.map((c, i) => (
                     <td
                       key={c.key}
-                      style={indent(r, firstTextKey, c.key)}
-                      className={`px-3 py-2 align-top ${
-                        isNumeric(c) || c.type === 'DATE' || NOWRAP_KEYS.has(c.key)
-                          ? `whitespace-nowrap ${isNumeric(c) ? 'text-right tabular-nums' : ''}`
-                          : WIDE_KEYS.has(c.key)
-                            ? 'min-w-[220px]'
-                            : 'min-w-[120px]'
-                      } ${c.key === 'voucher' && r.cells._voucherId ? 'font-mono text-indigo-700 underline decoration-dotted' : ''}`}
+                      className={`${cellPad} bg-slate-900 py-2.5 ${isNumeric(c) ? 'whitespace-nowrap text-right tabular-nums' : ''} ${
+                        i === 0 ? 'md:sticky md:left-0 md:z-10 md:shadow-[1px_0_0_#475569]' : ''
+                      }`}
                     >
-                      {formatCell(c, r.cells[c.key])}
+                      {i === 0 ? 'TOTALES' : report.totals[c.key] !== undefined ? formatCell(c, report.totals[c.key]) : ''}
                     </td>
                   ))}
                 </tr>
-              );
-            })
-          )}
-        </tbody>
-        {Object.keys(report.totals).length > 0 && report.rows.length > 0 && (
-          <tfoot>
-            <tr className="bg-slate-900 font-bold text-white">
-              {cols.map((c, i) => (
-                <td key={c.key} className={`px-3 py-2.5 ${isNumeric(c) ? 'whitespace-nowrap text-right tabular-nums' : ''}`}>
-                  {i === 0 ? 'TOTALES' : report.totals[c.key] !== undefined ? formatCell(c, report.totals[c.key]) : ''}
-                </td>
-              ))}
-            </tr>
-          </tfoot>
-        )}
-      </table>
+              </tfoot>
+            )}
+          </table>
+        </div>
+        {/* Sombras que indican columnas fuera de vista */}
+        <div
+          aria-hidden="true"
+          className={`pointer-events-none absolute inset-y-0 right-0 hidden w-10 rounded-r-lg bg-linear-to-l from-slate-900/15 to-transparent transition-opacity md:block ${
+            edges.right ? 'opacity-100' : 'opacity-0'
+          }`}
+        />
+        <div
+          aria-hidden="true"
+          className={`pointer-events-none absolute inset-y-0 left-0 hidden w-6 rounded-l-lg bg-linear-to-r from-slate-900/10 to-transparent transition-opacity md:block ${
+            edges.left ? 'opacity-100' : 'opacity-0'
+          }`}
+        />
+      </div>
     </div>
   );
 };
