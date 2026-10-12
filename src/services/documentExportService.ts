@@ -34,6 +34,14 @@ export const documentExportService = {
     return downloadBlobFile(`/associates/receipts/${receiptId}/pdf`, name);
   },
 
+  async getAssociateReceiptPdfBlob(receiptId: string): Promise<Blob> {
+    const response = await apiClient.get(`/associates/receipts/${receiptId}/pdf`, {
+      responseType: 'blob',
+    });
+    return new Blob([response.data], { type: 'application/pdf' });
+  },
+
+
   async downloadTreasuryPaymentPdf(paymentId: string, receiptNumber?: string): Promise<void> {
     const name = receiptNumber ? `Comprobante_Pago_${receiptNumber}.pdf` : `Comprobante_Pago_${paymentId}.pdf`;
     return downloadBlobFile(`/treasury/payments/${paymentId}/pdf`, name);

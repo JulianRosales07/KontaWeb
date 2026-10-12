@@ -69,6 +69,10 @@ export const associateApi = {
     const res = await httpClient.get<AssociateStatement>(`/associates/${thirdPartyId}/statement`);
     return res.data ?? null;
   },
+
+  async sendReceiptEmail(receiptId: string): Promise<void> {
+    await httpClient.post(`/associates/receipts/${receiptId}/send-email`);
+  },
 };
 
 export const CATEGORY_LABELS: Record<string, string> = {

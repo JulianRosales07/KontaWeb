@@ -369,6 +369,8 @@ export const QuotaReceiptModal: React.FC<Props> = ({ open, onClose, onRegistered
   };
 
   const [downloadingPdf, setDownloadingPdf] = useState(false);
+  const [sendingEmail, setSendingEmail] = useState(false);
+  const [shareNotice, setShareNotice] = useState<{ type: 'success' | 'info' | 'error'; message: string } | null>(null);
 
   const handleDownloadPdf = async () => {
     if (!receipt) return;
@@ -382,29 +384,85 @@ export const QuotaReceiptModal: React.FC<Props> = ({ open, onClose, onRegistered
     }
   };
 
-  const handleSendWhatsApp = () => {
+  const handleSendWhatsApp = async () => {
     if (!receipt || !associate) return;
+    setShareNotice(null);
+
+    try {
+      // 1. Obtener el archivo binario del PDF generado
+      const pdfBlob = await documentExportService.getAssociateReceiptPdfBlob(receipt.id);
+      const filename = `Recibo_${receipt.receiptNumber}.pdf`;
+      const file = new File([pdfBlob], filename, { type: 'application/pdf' });
+
+      // 2. Si el sistema operativo / navegador soporta compartir archivos directamente (Móviles, Windows Edge/Chrome)
+      if (typeof navigator !== 'undefined' && navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          files: [file],
+          title: `Recibo de Caja ${receipt.receiptNumber}`,
+          text: `Hola ${associate.fullName}, le compartimos su comprobante de recaudo N° ${receipt.receiptNumber}.`,
+        });
+        setShareNotice({ type: 'success', message: '¡Recibo en PDF compartido exitosamente!' });
+        return;
+      }
+    } catch (e: any) {
+      if (e?.name === 'AbortError') return; // Cancelado por el usuario
+    }
+
+    // 3. Fallback para WhatsApp Web en PC: Descargar el archivo PDF en el equipo y abrir WhatsApp
+    try {
+      await documentExportService.downloadAssociateReceiptPdf(receipt.id, receipt.receiptNumber);
+    } catch {
+      // continuar
+    }
+
     const phone = associate.phone ? associate.phone.replace(/[^0-9]/g, '') : '';
     const totalFormatted = formatCOP(
       receipt.totalAmount + (receipt.loanPayment?.totalAmount ?? 0)
     );
-    const text = `Hola ${associate.fullName}, le compartimos el soporte de su recaudo de cuota N° ${receipt.receiptNumber} por valor de ${totalFormatted} (Fecha: ${formatDate(receipt.paymentDate)}). ¡Muchas gracias por su puntualidad!`;
+    const text = `Hola ${associate.fullName}, le compartimos su recibo oficial de cuota N° ${receipt.receiptNumber} por valor de ${totalFormatted} (Fecha: ${formatDate(receipt.paymentDate)}).`;
     const url = phone
       ? `https://wa.me/57${phone}?text=${encodeURIComponent(text)}`
       : `https://wa.me/?text=${encodeURIComponent(text)}`;
     window.open(url, '_blank');
+
+    setShareNotice({
+      type: 'info',
+      message: '📥 El archivo PDF del recibo se ha descargado a tu equipo. Solo arrástralo o adjúntalo en el chat de WhatsApp que se acaba de abrir.',
+    });
   };
 
-  const handleSendEmail = () => {
+  const handleSendEmail = async () => {
     if (!receipt || !associate) return;
-    const email = associate.email || '';
-    const totalFormatted = formatCOP(
-      receipt.totalAmount + (receipt.loanPayment?.totalAmount ?? 0)
-    );
-    const subject = `Comprobante de Recaudo ${receipt.receiptNumber} - ${associate.fullName}`;
-    const body = `Estimado(a) ${associate.fullName},\n\nLe confirmamos el registro exitoso de su pago:\n- Recibo: ${receipt.receiptNumber}\n- Fecha: ${formatDate(receipt.paymentDate)}\n- Total: ${totalFormatted}\n- Comprobante Contable: ${receipt.voucherNumber || 'Registrado'}\n\nPuede solicitar o descargar su recibo oficial en PDF directamente en el sistema.\n\nCordialmente,\nAdministración`;
-    const mailtoUrl = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    window.location.href = mailtoUrl;
+    setShareNotice(null);
+    setSendingEmail(true);
+
+    try {
+      // 1. Intentar envío directo desde el servidor con el PDF adjunto (vía Resend / SMTP)
+      await associateApi.sendReceiptEmail(receipt.id);
+      setShareNotice({
+        type: 'success',
+        message: `✅ Recibo en PDF enviado exitosamente al correo ${associate.email}.`,
+      });
+    } catch (err: any) {
+      // 2. Si el servidor aún no tiene configurada la llave de Resend, descargamos el PDF oficial para que lo adjunte
+      await documentExportService.downloadAssociateReceiptPdf(receipt.id, receipt.receiptNumber);
+
+      const email = associate.email || '';
+      const totalFormatted = formatCOP(
+        receipt.totalAmount + (receipt.loanPayment?.totalAmount ?? 0)
+      );
+      const subject = `Comprobante de Recaudo ${receipt.receiptNumber} - ${associate.fullName}`;
+      const body = `Estimado(a) ${associate.fullName},\n\nLe confirmamos el registro exitoso de su pago:\n- Recibo: ${receipt.receiptNumber}\n- Fecha: ${formatDate(receipt.paymentDate)}\n- Total: ${totalFormatted}\n- Comprobante: ${receipt.voucherNumber || 'Registrado'}\n\nSe adjunta el soporte oficial en PDF.`;
+      const mailtoUrl = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      window.location.href = mailtoUrl;
+
+      setShareNotice({
+        type: 'info',
+        message: '📥 El archivo PDF del recibo se ha descargado en tu equipo. Adjúntalo en la ventana de correo que se abrió.',
+      });
+    } finally {
+      setSendingEmail(false);
+    }
   };
 
   const handleLoanSendWhatsApp = () => {
@@ -495,7 +553,7 @@ export const QuotaReceiptModal: React.FC<Props> = ({ open, onClose, onRegistered
                 type="button"
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-lg transition-colors"
                 onClick={handleSendWhatsApp}
-                title="Compartir soporte por WhatsApp"
+                title="Compartir soporte PDF por WhatsApp"
               >
                 <MessageSquare size={15} /> WhatsApp
               </button>
@@ -503,9 +561,10 @@ export const QuotaReceiptModal: React.FC<Props> = ({ open, onClose, onRegistered
                 type="button"
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-sky-700 bg-sky-50 hover:bg-sky-100 border border-sky-200 rounded-lg transition-colors"
                 onClick={handleSendEmail}
-                title="Enviar notificación por correo al asociado"
+                disabled={sendingEmail}
+                title="Enviar notificación por correo con el PDF adjunto"
               >
-                <Mail size={15} /> Correo
+                <Mail size={15} /> {sendingEmail ? 'Enviando...' : 'Correo'}
               </button>
               <button
                 type="button"
@@ -531,6 +590,13 @@ export const QuotaReceiptModal: React.FC<Props> = ({ open, onClose, onRegistered
               : `Recaudo por ${formatCOP(receipt.totalAmount)} contabilizado.`}
           </span>
         </Alert>
+        {shareNotice && (
+          <div className="mt-3">
+            <Alert tone={shareNotice.type === 'success' ? 'success' : 'info'}>
+              {shareNotice.message}
+            </Alert>
+          </div>
+        )}
         <div className="mt-4">
           <QuotaReceiptDocument receipt={receipt} documentId={documentId} showPreview />
         </div>
