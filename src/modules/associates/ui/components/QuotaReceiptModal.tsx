@@ -72,6 +72,7 @@ export const QuotaReceiptModal: React.FC<Props> = ({ open, onClose, onRegistered
   // Recibo final generado
   const [receipt, setReceipt] = useState<AssociateReceipt | null>(null);
   const [loanReceipt, setLoanReceipt] = useState<LoanPaymentReceipt | null>(null);
+  const [extraSavingsInput, setExtraSavingsInput] = useState<number | null>(null);
 
   const { documentId, print } = usePrintDocument();
 
@@ -88,6 +89,7 @@ export const QuotaReceiptModal: React.FC<Props> = ({ open, onClose, onRegistered
     setLoanReceipt(null);
     setSelectedInstallments({});
     setLoanId(null);
+    setExtraSavingsInput(null);
 
     associateApi.getTemplates().then((t) => {
       setTemplates(t);
@@ -229,19 +231,36 @@ export const QuotaReceiptModal: React.FC<Props> = ({ open, onClose, onRegistered
 
   const updateConcept = (key: string, patch: Partial<Concept>) => setConcepts((cs) => cs.map((c) => (c.key === key ? { ...c, ...patch } : c)));
 
-  const handleQuickAddSavings = (amountToAdd: number) => {
+  const handleApplyExtraSavings = () => {
+    if (!extraSavingsInput || extraSavingsInput <= 0) return;
+    const amountToAdd = extraSavingsInput;
     setConcepts((prev) => {
       let targetIndex = prev.findIndex((c) => c.accountCode === '311510' || c.conceptName.toLowerCase().includes('extra'));
       if (targetIndex === -1) {
         targetIndex = prev.findIndex((c) => isSavingConcept(c));
       }
-      if (targetIndex === -1) return prev;
+      if (targetIndex === -1) {
+        return [
+          ...prev,
+          {
+            key: `custom-${Date.now()}`,
+            conceptName: 'Ahorro Voluntario / Extra',
+            category: 'EQUITY_SAVING',
+            accountCode: '311510',
+            accountName: 'Aportes extraordinarios',
+            amount: amountToAdd,
+            enabled: true,
+            mandatory: false,
+          },
+        ];
+      }
       return prev.map((c, idx) =>
         idx === targetIndex
           ? { ...c, enabled: true, amount: (c.amount ?? 0) + amountToAdd }
           : c
       );
     });
+    setExtraSavingsInput(null);
   };
 
   const handleAddCustomConcept = () => {
@@ -254,7 +273,7 @@ export const QuotaReceiptModal: React.FC<Props> = ({ open, onClose, onRegistered
         category: 'EQUITY_SAVING',
         accountCode: '311510',
         accountName: 'Aportes extraordinarios',
-        amount: 50000,
+        amount: null,
         enabled: true,
         mandatory: false,
       },
@@ -571,40 +590,39 @@ export const QuotaReceiptModal: React.FC<Props> = ({ open, onClose, onRegistered
             </div>
 
             {/* Barra de Abono Rápido / Ahorro Extra */}
-            <div className="rounded-lg bg-indigo-50/70 p-3 border border-indigo-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+            <div className="rounded-lg bg-indigo-50/70 p-3 border border-indigo-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="flex items-center gap-2">
                 <PiggyBank size={18} className="text-indigo-600 shrink-0" />
                 <div>
                   <span className="text-xs font-bold text-indigo-950 block">Abono Mayor / Ahorro Extraordinario</span>
                   <span className="text-[11px] text-indigo-700/80">
-                    Abona más de los $50.000 sumando directamente a los ahorros del socio:
+                    Digita el valor adicional para sumar directamente a los ahorros del socio:
                   </span>
                 </div>
               </div>
-              <div className="flex flex-wrap items-center gap-1.5 shrink-0">
+              <div className="flex items-center gap-2 shrink-0">
+                <div className="w-36 sm:w-44">
+                  <MoneyInput
+                    value={extraSavingsInput}
+                    onChange={setExtraSavingsInput}
+                    placeholder="0"
+                    aria-label="Valor adicional de ahorro"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleApplyExtraSavings();
+                      }
+                    }}
+                  />
+                </div>
                 <button
                   type="button"
-                  onClick={() => handleQuickAddSavings(20000)}
-                  className="px-2.5 py-1 text-xs font-semibold rounded-md bg-white border border-indigo-200 text-indigo-700 hover:bg-indigo-600 hover:text-white transition-colors cursor-pointer shadow-2xs"
-                  title="Sumar $20.000 al aporte extra"
+                  onClick={handleApplyExtraSavings}
+                  disabled={!extraSavingsInput || extraSavingsInput <= 0}
+                  className="px-3 py-2 text-xs font-semibold rounded-md bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer shadow-2xs whitespace-nowrap"
+                  title="Sumar valor digitado a los ahorros del socio"
                 >
-                  + $20.000
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleQuickAddSavings(50000)}
-                  className="px-2.5 py-1 text-xs font-semibold rounded-md bg-white border border-indigo-200 text-indigo-700 hover:bg-indigo-600 hover:text-white transition-colors cursor-pointer shadow-2xs"
-                  title="Sumar $50.000 al aporte extra"
-                >
-                  + $50.000
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleQuickAddSavings(100000)}
-                  className="px-2.5 py-1 text-xs font-semibold rounded-md bg-white border border-indigo-200 text-indigo-700 hover:bg-indigo-600 hover:text-white transition-colors cursor-pointer shadow-2xs"
-                  title="Sumar $100.000 al aporte extra"
-                >
-                  + $100.000
+                  + Sumar al ahorro
                 </button>
               </div>
             </div>
@@ -644,32 +662,13 @@ export const QuotaReceiptModal: React.FC<Props> = ({ open, onClose, onRegistered
                       </span>
                     </span>
                   </label>
-                  <div className="flex flex-col gap-1 items-end">
+                  <div>
                     <MoneyInput
                       value={c.amount}
                       onChange={(v) => updateConcept(c.key, { amount: v })}
                       disabled={!c.enabled}
                       aria-label={`Valor ${c.conceptName}`}
                     />
-                    {isSavingConcept(c) && c.enabled && (
-                      <div className="flex items-center gap-1 text-[10px] text-slate-500">
-                        <span>Sumar:</span>
-                        <button
-                          type="button"
-                          onClick={() => updateConcept(c.key, { amount: (c.amount ?? 0) + 10000 })}
-                          className="px-1 py-0.2 rounded hover:bg-indigo-50 text-indigo-600 font-semibold cursor-pointer"
-                        >
-                          +10k
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => updateConcept(c.key, { amount: (c.amount ?? 0) + 50000 })}
-                          className="px-1 py-0.2 rounded hover:bg-indigo-50 text-indigo-600 font-semibold cursor-pointer"
-                        >
-                          +50k
-                        </button>
-                      </div>
-                    )}
                   </div>
                 </div>
               ))}
