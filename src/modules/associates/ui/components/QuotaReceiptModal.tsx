@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { CheckCircle2, Printer, HandCoins, ReceiptText, Layers, Wallet, PiggyBank, PlusCircle, Sparkles, Gavel } from 'lucide-react';
+import { CheckCircle2, Printer, HandCoins, ReceiptText, Layers, Wallet, PiggyBank, PlusCircle, Sparkles, Gavel, Download, MessageSquare, Mail } from 'lucide-react';
+import { documentExportService } from '../../../../services/documentExportService';
 import { fineApi, type Fine } from '../../../fines/api/fineApi';
 import { associateApi, CATEGORY_LABELS } from '../../infrastructure/associateApi';
 import type { AssociateReceipt, QuotaCategory, QuotaTemplate } from '../../types/associate';
@@ -367,6 +368,64 @@ export const QuotaReceiptModal: React.FC<Props> = ({ open, onClose, onRegistered
     }
   };
 
+  const [downloadingPdf, setDownloadingPdf] = useState(false);
+
+  const handleDownloadPdf = async () => {
+    if (!receipt) return;
+    try {
+      setDownloadingPdf(true);
+      await documentExportService.downloadAssociateReceiptPdf(receipt.id, receipt.receiptNumber);
+    } catch {
+      print();
+    } finally {
+      setDownloadingPdf(false);
+    }
+  };
+
+  const handleSendWhatsApp = () => {
+    if (!receipt || !associate) return;
+    const phone = associate.phone ? associate.phone.replace(/[^0-9]/g, '') : '';
+    const totalFormatted = formatCOP(
+      receipt.totalAmount + (receipt.loanPayment?.totalAmount ?? 0)
+    );
+    const text = `Hola ${associate.fullName}, le compartimos el soporte de su recaudo de cuota N° ${receipt.receiptNumber} por valor de ${totalFormatted} (Fecha: ${formatDate(receipt.paymentDate)}). ¡Muchas gracias por su puntualidad!`;
+    const url = phone
+      ? `https://wa.me/57${phone}?text=${encodeURIComponent(text)}`
+      : `https://wa.me/?text=${encodeURIComponent(text)}`;
+    window.open(url, '_blank');
+  };
+
+  const handleSendEmail = () => {
+    if (!receipt || !associate) return;
+    const email = associate.email || '';
+    const totalFormatted = formatCOP(
+      receipt.totalAmount + (receipt.loanPayment?.totalAmount ?? 0)
+    );
+    const subject = `Comprobante de Recaudo ${receipt.receiptNumber} - ${associate.fullName}`;
+    const body = `Estimado(a) ${associate.fullName},\n\nLe confirmamos el registro exitoso de su pago:\n- Recibo: ${receipt.receiptNumber}\n- Fecha: ${formatDate(receipt.paymentDate)}\n- Total: ${totalFormatted}\n- Comprobante Contable: ${receipt.voucherNumber || 'Registrado'}\n\nPuede solicitar o descargar su recibo oficial en PDF directamente en el sistema.\n\nCordialmente,\nAdministración`;
+    const mailtoUrl = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    window.location.href = mailtoUrl;
+  };
+
+  const handleLoanSendWhatsApp = () => {
+    if (!loanReceipt || !associate) return;
+    const phone = associate.phone ? associate.phone.replace(/[^0-9]/g, '') : '';
+    const text = `Hola ${associate.fullName}, le compartimos el soporte de su abono al préstamo N° ${loanReceipt.receiptNumber} por valor de ${formatCOP(loanReceipt.totalAmount)} (Fecha: ${formatDate(loanReceipt.paymentDate)}).`;
+    const url = phone
+      ? `https://wa.me/57${phone}?text=${encodeURIComponent(text)}`
+      : `https://wa.me/?text=${encodeURIComponent(text)}`;
+    window.open(url, '_blank');
+  };
+
+  const handleLoanSendEmail = () => {
+    if (!loanReceipt || !associate) return;
+    const email = associate.email || '';
+    const subject = `Comprobante de Abono a Préstamo ${loanReceipt.receiptNumber} - ${associate.fullName}`;
+    const body = `Estimado(a) ${associate.fullName},\n\nLe confirmamos el registro de su abono al crédito:\n- Recibo: ${loanReceipt.receiptNumber}\n- Fecha: ${formatDate(loanReceipt.paymentDate)}\n- Total Abonado: ${formatCOP(loanReceipt.totalAmount)}\n- Abono a Capital: ${formatCOP(loanReceipt.principalApplied)}\n- Intereses: ${formatCOP(loanReceipt.interestApplied)}\n\nCordialmente,\nAdministración`;
+    const mailtoUrl = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    window.location.href = mailtoUrl;
+  };
+
   // Pantalla de éxito tras registrar
   if (loanReceipt) {
     return (
@@ -377,14 +436,32 @@ export const QuotaReceiptModal: React.FC<Props> = ({ open, onClose, onRegistered
         title="Abono a préstamo registrado"
         subtitle={`Recibo ${loanReceipt.receiptNumber} · Comprobante ${loanReceipt.voucherNumber ?? ''}`}
         footer={
-          <>
+          <div className="flex flex-wrap items-center justify-between gap-2 w-full">
             <button type="button" className={buttonClass.secondary} onClick={onClose}>
               Cerrar
             </button>
-            <button type="button" className={buttonClass.primary} onClick={print}>
-              <Printer size={16} /> Imprimir recibo
-            </button>
-          </>
+            <div className="flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-lg transition-colors"
+                onClick={handleLoanSendWhatsApp}
+                title="Compartir por WhatsApp"
+              >
+                <MessageSquare size={15} /> WhatsApp
+              </button>
+              <button
+                type="button"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-sky-700 bg-sky-50 hover:bg-sky-100 border border-sky-200 rounded-lg transition-colors"
+                onClick={handleLoanSendEmail}
+                title="Enviar por correo"
+              >
+                <Mail size={15} /> Correo
+              </button>
+              <button type="button" className={buttonClass.primary} onClick={print}>
+                <Printer size={16} /> Imprimir recibo
+              </button>
+            </div>
+          </div>
         }
       >
         <Alert tone="success">
@@ -409,14 +486,41 @@ export const QuotaReceiptModal: React.FC<Props> = ({ open, onClose, onRegistered
         title={receipt.loanPayment ? 'Recaudo combinado registrado' : 'Recaudo registrado'}
         subtitle={`Recibo ${receipt.receiptNumber} · Comprobante ${receipt.voucherNumber ?? ''}`}
         footer={
-          <>
+          <div className="flex flex-wrap items-center justify-between gap-2 w-full">
             <button type="button" className={buttonClass.secondary} onClick={onClose}>
               Cerrar
             </button>
-            <button type="button" className={buttonClass.primary} onClick={print}>
-              <Printer size={16} /> Imprimir recibo
-            </button>
-          </>
+            <div className="flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-lg transition-colors"
+                onClick={handleSendWhatsApp}
+                title="Compartir soporte por WhatsApp"
+              >
+                <MessageSquare size={15} /> WhatsApp
+              </button>
+              <button
+                type="button"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-sky-700 bg-sky-50 hover:bg-sky-100 border border-sky-200 rounded-lg transition-colors"
+                onClick={handleSendEmail}
+                title="Enviar notificación por correo al asociado"
+              >
+                <Mail size={15} /> Correo
+              </button>
+              <button
+                type="button"
+                className={buttonClass.secondary}
+                onClick={handleDownloadPdf}
+                disabled={downloadingPdf}
+                title="Descargar PDF oficial generado desde la base de datos"
+              >
+                <Download size={15} /> {downloadingPdf ? 'Descargando...' : 'Descargar PDF'}
+              </button>
+              <button type="button" className={buttonClass.primary} onClick={print}>
+                <Printer size={16} /> Imprimir recibo
+              </button>
+            </div>
+          </div>
         }
       >
         <Alert tone="success">
